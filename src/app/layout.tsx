@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Montserrat } from "next/font/google";
+import { Outfit, Montserrat } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { WhatsAppFAB } from "@/components/layout/WhatsAppFAB";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const outfit = Outfit({
+  variable: "--font-heading",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
@@ -46,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body
-        className={`${spaceGrotesk.variable} ${montserrat.variable} antialiased`}
+        className={`${outfit.variable} ${montserrat.variable} antialiased`}
       >
         <Navbar />
         <main>{children}</main>
