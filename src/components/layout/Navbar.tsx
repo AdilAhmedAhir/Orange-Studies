@@ -184,7 +184,7 @@ export function Navbar() {
                             damping: 24,
                             mass: 0.6,
                         }}
-                        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden lg:flex items-center gap-1 rounded-full border border-white/[0.08] bg-black/60 px-2.5 py-2 backdrop-blur-2xl shadow-2xl shadow-black/40"
+                        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden lg:flex items-center gap-1 rounded-full border border-white/15 bg-black/60 px-2.5 py-2 backdrop-blur-2xl shadow-2xl shadow-black/40"
                     >
                         {/* Mini logo */}
                         <Link href="/" className="mr-1">
@@ -235,7 +235,7 @@ export function Navbar() {
                             damping: 24,
                             mass: 0.6,
                         }}
-                        className="fixed top-3 left-3 right-3 z-50 flex lg:hidden items-center justify-between rounded-2xl border border-white/[0.08] bg-black/60 px-4 py-2.5 backdrop-blur-2xl shadow-2xl shadow-black/40"
+                        className="fixed top-3 left-3 right-3 z-50 flex lg:hidden items-center justify-between rounded-2xl border border-white/15 bg-black/60 px-4 py-2.5 backdrop-blur-2xl shadow-2xl shadow-black/40"
                     >
                         {/* Mini logo + brand */}
                         <Link href="/" className="flex items-center gap-2">

@@ -74,30 +74,30 @@ function StepNode({
             className="group relative"
         >
             <div
-                className={`relative overflow-hidden rounded-2xl border p-8 transition-all duration-700 ${active
-                        ? `border-white/20 bg-white/[0.08] shadow-2xl ${step.glowColor}`
-                        : "border-white/5 bg-white/[0.03]"
+                className={`relative overflow-hidden rounded-2xl border p-6 pt-4 transition-all duration-700 ${active
+                    ? `border-white/20 bg-white/[0.08] shadow-2xl ${step.glowColor}`
+                    : "border-white/5 bg-white/[0.03]"
                     }`}
             >
                 {/* Animated glow backdrop */}
                 <motion.div
                     className={`pointer-events-none absolute inset-0 bg-radial-[at_50%_0%] ${step.color === "text-blue-400"
-                            ? "from-blue-500/10"
-                            : step.color === "text-brand-purple-light"
-                                ? "from-purple-500/10"
-                                : step.color === "text-brand-orange-light"
-                                    ? "from-brand-orange/10"
-                                    : "from-emerald-500/10"
+                        ? "from-blue-500/10"
+                        : step.color === "text-brand-purple-light"
+                            ? "from-purple-500/10"
+                            : step.color === "text-brand-orange-light"
+                                ? "from-brand-orange/10"
+                                : "from-emerald-500/10"
                         } to-transparent`}
                     animate={{ opacity: active ? 1 : 0 }}
                     transition={{ duration: 0.8 }}
                 />
 
-                {/* Step number badge */}
+                {/* Step number badge — inline, not absolutely positioned */}
                 <motion.span
-                    className={`absolute -top-3 left-6 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg transition-all duration-500 ${active
-                            ? "bg-brand-orange shadow-brand-orange/30"
-                            : "bg-white/10"
+                    className={`mb-4 inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg transition-all duration-500 ${active
+                        ? "bg-brand-orange shadow-brand-orange/30"
+                        : "bg-white/10"
                         }`}
                     animate={{ scale: active ? 1.05 : 1 }}
                 >
@@ -106,7 +106,7 @@ function StepNode({
 
                 {/* Icon with pulse */}
                 <motion.div
-                    className={`mb-5 mt-2 inline-flex rounded-xl ${step.bg} p-4 ${step.color} transition-all duration-500`}
+                    className={`mb-5 inline-flex rounded-xl ${step.bg} p-4 ${step.color} transition-all duration-500`}
                     animate={
                         active
                             ? { scale: [1, 1.08, 1], rotate: [0, 3, 0] }
@@ -134,12 +134,12 @@ function StepNode({
                 {/* Bottom accent line */}
                 <motion.div
                     className={`absolute bottom-0 left-0 h-0.5 ${step.color === "text-blue-400"
-                            ? "bg-blue-400"
-                            : step.color === "text-brand-purple-light"
-                                ? "bg-brand-purple-light"
-                                : step.color === "text-brand-orange-light"
-                                    ? "bg-brand-orange"
-                                    : "bg-emerald-400"
+                        ? "bg-blue-400"
+                        : step.color === "text-brand-purple-light"
+                            ? "bg-brand-purple-light"
+                            : step.color === "text-brand-orange-light"
+                                ? "bg-brand-orange"
+                                : "bg-emerald-400"
                         }`}
                     animate={{ width: active ? "100%" : "0%" }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
