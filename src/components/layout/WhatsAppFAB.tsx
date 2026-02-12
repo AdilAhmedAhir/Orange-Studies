@@ -112,7 +112,7 @@ export function WhatsAppFAB() {
                 onClick={() => setIsOpen(!isOpen)}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="relative z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-orange to-brand-purple shadow-lg shadow-brand-purple/30 transition-shadow hover:shadow-xl hover:shadow-brand-purple/40"
+                className="relative z-50 flex h-14 w-14 items-center justify-center rounded-full bg-brand-deep ring-2 ring-brand-orange/40 shadow-lg shadow-brand-orange/20 transition-shadow hover:shadow-xl hover:shadow-brand-orange/30"
             >
                 {/* Pulse ring */}
                 {!isOpen && (
