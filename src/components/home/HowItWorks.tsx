@@ -93,7 +93,7 @@ function StepNode({
                     transition={{ duration: 0.8 }}
                 />
 
-                {/* Step number badge — inline, not absolutely positioned */}
+                {/* Step number badge — block display forces icon below */}
                 <motion.span
                     className={`mb-4 inline-block rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg transition-all duration-500 ${active
                         ? "bg-brand-orange shadow-brand-orange/30"
@@ -106,7 +106,7 @@ function StepNode({
 
                 {/* Icon with pulse */}
                 <motion.div
-                    className={`mb-4 inline-flex rounded-xl ${step.bg} p-2.5 sm:p-4 ${step.color} transition-all duration-500`}
+                    className={`mb-4 w-fit rounded-xl ${step.bg} p-2.5 sm:p-4 ${step.color} transition-all duration-500`}
                     animate={
                         active
                             ? { scale: [1, 1.08, 1], rotate: [0, 3, 0] }

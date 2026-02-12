@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, GraduationCap, Users, Building2 } from "lucide-react";
+import { X, GraduationCap, Users, Building2 } from "lucide-react";
+import { LogoIcon } from "@/components/ui/LogoIcon";
 
 const WHATSAPP_NUMBER = "923001234567"; // Replace with actual number
 
@@ -137,7 +138,7 @@ export function WhatsAppFAB() {
                             exit={{ rotate: -90, scale: 0 }}
                             transition={{ duration: 0.2 }}
                         >
-                            <MessageCircle size={24} className="text-white" />
+                            <LogoIcon size={28} />
                         </motion.div>
                     )}
                 </AnimatePresence>
