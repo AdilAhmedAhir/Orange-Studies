@@ -355,16 +355,16 @@ export function HeroParticleMap() {
 
         // Update logo reveal element opacity/scale directly from the same progress
         if (logoRevealRef.current) {
-            // Logo fades in: progress 0.20→0.32, stays 0.32→0.50, fades out: 0.50→0.62
+            // Logo fades in: progress 0.15→0.28, stays 0.28→0.55, fades out: 0.55→0.68
             let logoAlpha = 0;
-            if (progress >= 0.20 && progress < 0.32) {
-                logoAlpha = (progress - 0.20) / 0.12;
-            } else if (progress >= 0.32 && progress < 0.50) {
+            if (progress >= 0.15 && progress < 0.28) {
+                logoAlpha = (progress - 0.15) / 0.13;
+            } else if (progress >= 0.28 && progress < 0.55) {
                 logoAlpha = 1;
-            } else if (progress >= 0.50 && progress < 0.62) {
-                logoAlpha = 1 - (progress - 0.50) / 0.12;
+            } else if (progress >= 0.55 && progress < 0.68) {
+                logoAlpha = 1 - (progress - 0.55) / 0.13;
             }
-            const logoScaleVal = progress < 0.32 ? 0.6 + 0.4 * Math.min(1, Math.max(0, (progress - 0.20) / 0.12)) : 1;
+            const logoScaleVal = progress < 0.28 ? 0.6 + 0.4 * Math.min(1, Math.max(0, (progress - 0.15) / 0.13)) : 1;
             logoRevealRef.current.style.opacity = String(logoAlpha);
             logoRevealRef.current.style.transform = `scale(${logoScaleVal})`;
         }
@@ -408,7 +408,7 @@ export function HeroParticleMap() {
     const videoScale = useTransform(scrollYProgress, [0, 1], [1.15, 1]);
 
     return (
-        <section ref={containerRef} style={{ height: "250vh" }} className="relative">
+        <section ref={containerRef} style={{ height: "300vh" }} className="relative">
             <div className="sticky top-0 h-screen w-full overflow-hidden">
 
                 {/* LAYER 1 — Background + canvas particles */}
