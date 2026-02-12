@@ -18,7 +18,7 @@ interface Step {
 
 const steps: Step[] = [
     {
-        icon: <Search className="h-6 w-6" />,
+        icon: <Search className="h-5 w-5" />,
         number: "01",
         title: "Explore",
         desc: "Browse 200+ universities across 15 countries. Filter by course, budget, and location to find your perfect match.",
@@ -27,7 +27,7 @@ const steps: Step[] = [
         glowColor: "shadow-blue-500/30",
     },
     {
-        icon: <FileText className="h-6 w-6" />,
+        icon: <FileText className="h-5 w-5" />,
         number: "02",
         title: "Apply",
         desc: "Our counselors guide you through every application — from SOP to documents. We make the complex simple.",
@@ -36,7 +36,7 @@ const steps: Step[] = [
         glowColor: "shadow-brand-purple/30",
     },
     {
-        icon: <Plane className="h-6 w-6" />,
+        icon: <Plane className="h-5 w-5" />,
         number: "03",
         title: "Get Your Visa",
         desc: "98% visa success rate. We prepare your case, coach you for interviews, and handle the paperwork.",
@@ -45,7 +45,7 @@ const steps: Step[] = [
         glowColor: "shadow-brand-orange/30",
     },
     {
-        icon: <GraduationCap className="h-6 w-6" />,
+        icon: <GraduationCap className="h-5 w-5" />,
         number: "04",
         title: "Start Your Journey",
         desc: "Pre-departure briefings, airport pickup, accommodation — we've got you covered from takeoff to first lecture.",
@@ -106,7 +106,7 @@ function StepNode({
 
                 {/* Icon with pulse */}
                 <motion.div
-                    className={`mb-5 inline-flex rounded-xl ${step.bg} p-4 ${step.color} transition-all duration-500`}
+                    className={`mb-4 inline-flex rounded-xl ${step.bg} p-2.5 sm:p-4 ${step.color} transition-all duration-500`}
                     animate={
                         active
                             ? { scale: [1, 1.08, 1], rotate: [0, 3, 0] }
