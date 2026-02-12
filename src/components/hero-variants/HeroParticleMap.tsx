@@ -408,7 +408,7 @@ export function HeroParticleMap() {
     const videoScale = useTransform(scrollYProgress, [0, 1], [1.15, 1]);
 
     return (
-        <section ref={containerRef} style={{ height: "200vh" }} className="relative">
+        <section ref={containerRef} style={{ height: "250vh" }} className="relative">
             <div className="sticky top-0 h-screen w-full overflow-hidden">
 
                 {/* LAYER 1 — Background + canvas particles */}
