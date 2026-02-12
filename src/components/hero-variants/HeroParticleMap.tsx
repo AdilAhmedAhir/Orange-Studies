@@ -374,7 +374,8 @@ export function HeroParticleMap() {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const resize = () => {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const isMobile = window.innerWidth <= 768;
+            const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 2);
             canvas.width = window.innerWidth * dpr;
             canvas.height = window.innerHeight * dpr;
             canvas.style.width = `${window.innerWidth}px`;
@@ -545,7 +546,7 @@ export function HeroParticleMap() {
                 <motion.div className="absolute inset-0 z-[2]" style={{ clipPath, willChange: "clip-path" }}>
                     <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${POSTER_SRC})` }} />
                     <motion.div className="absolute inset-0" style={{ scale: videoScale }}>
-                        <video autoPlay loop muted playsInline poster={POSTER_SRC} preload="auto" className="h-full w-full object-cover">
+                        <video autoPlay loop muted playsInline poster={POSTER_SRC} preload="metadata" className="h-full w-full object-cover">
                             <source src={VIDEO_SRC} type="video/mp4" />
                         </video>
                     </motion.div>
@@ -557,7 +558,7 @@ export function HeroParticleMap() {
                     <motion.div className="relative flex flex-col items-center text-center px-6" style={{ scale: textScale, opacity: textOpacity }}>
                         {/* Subtle radial backdrop — just enough to lift text off noisy particle background */}
                         <div className="absolute inset-0 -mx-16 -my-10 rounded-3xl" style={{ background: 'radial-gradient(ellipse at center, rgba(10,1,24,0.55) 0%, rgba(10,1,24,0.3) 40%, transparent 70%)' }} />
-                        <div className="relative">
+                        <div className="relative flex flex-col items-center text-center">
                             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2 backdrop-blur-sm">
                                 <span className="h-2 w-2 rounded-full bg-brand-orange animate-pulse" />
                                 <span className="text-sm font-medium text-white/80">Your gateway to global education</span>
