@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, GraduationCap, Users, Building2 } from "lucide-react";
-import { LogoIcon } from "@/components/ui/LogoIcon";
+import { MessageCircle, X, GraduationCap, Users, Building2 } from "lucide-react";
 
 const WHATSAPP_NUMBER = "923001234567"; // Replace with actual number
 
@@ -112,7 +111,7 @@ export function WhatsAppFAB() {
                 onClick={() => setIsOpen(!isOpen)}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="relative z-50 flex h-14 w-14 items-center justify-center rounded-full bg-brand-deep ring-2 ring-brand-orange/40 shadow-lg shadow-brand-orange/20 transition-shadow hover:shadow-xl hover:shadow-brand-orange/30"
+                className="relative z-50 flex h-14 w-14 items-center justify-center rounded-full bg-brand-orange shadow-lg shadow-brand-orange/30 transition-shadow hover:shadow-xl hover:shadow-brand-orange/40"
             >
                 {/* Pulse ring */}
                 {!isOpen && (
@@ -138,7 +137,7 @@ export function WhatsAppFAB() {
                             exit={{ rotate: -90, scale: 0 }}
                             transition={{ duration: 0.2 }}
                         >
-                            <LogoIcon size={28} />
+                            <MessageCircle size={24} className="text-white" />
                         </motion.div>
                     )}
                 </AnimatePresence>
