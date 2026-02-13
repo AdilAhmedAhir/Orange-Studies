@@ -355,16 +355,28 @@ export function HeroParticleMap() {
 
         // Update logo reveal element opacity/scale directly from the same progress
         if (logoRevealRef.current) {
-            // Logo fades in: progress 0.15→0.28, stays 0.28→0.55, fades out: 0.55→0.68
+            // Logo fades in: progress 0.15→0.28, stays 0.28→0.35
+            // Then ZOOMS UP: 0.35→0.60 (scale 1→10), fades out 0.48→0.58
             let logoAlpha = 0;
             if (progress >= 0.15 && progress < 0.28) {
                 logoAlpha = (progress - 0.15) / 0.13;
-            } else if (progress >= 0.28 && progress < 0.55) {
+            } else if (progress >= 0.28 && progress < 0.48) {
                 logoAlpha = 1;
-            } else if (progress >= 0.55 && progress < 0.68) {
-                logoAlpha = 1 - (progress - 0.55) / 0.13;
+            } else if (progress >= 0.48 && progress < 0.58) {
+                logoAlpha = 1 - (progress - 0.48) / 0.10;
             }
-            const logoScaleVal = progress < 0.28 ? 0.6 + 0.4 * Math.min(1, Math.max(0, (progress - 0.15) / 0.13)) : 1;
+
+            // Scale: fade-in scale (0.6→1), then hold, then ZOOM (1→10)
+            let logoScaleVal = 1;
+            if (progress < 0.28) {
+                logoScaleVal = 0.6 + 0.4 * Math.min(1, Math.max(0, (progress - 0.15) / 0.13));
+            } else if (progress >= 0.35) {
+                const zoomProgress = Math.min(1, (progress - 0.35) / 0.25);
+                // Ease-in curve for dramatic zoom feel
+                const eased = zoomProgress * zoomProgress;
+                logoScaleVal = 1 + 9 * eased;
+            }
+
             logoRevealRef.current.style.opacity = String(logoAlpha);
             logoRevealRef.current.style.transform = `scale(${logoScaleVal})`;
         }
@@ -393,9 +405,10 @@ export function HeroParticleMap() {
     }, [drawParticles]);
 
     /* ── Standard hero transforms (compressed timeline) ──────── */
-    // Clip-path: start growing at 30%, cover screen by 70%
-    const clipRadius = useTransform(scrollYProgress, [0, 0.30, 0.55, 0.75], [0, 0, 50, 160]);
-    const clipPath = useTransform(clipRadius, (r: number) => `circle(${r}% at 50% 50%)`);
+    // Clip-path: grows from orange sphere center position (50% 54%)
+    // Starts at 40% (while logo is zooming), full screen by 65%
+    const clipRadius = useTransform(scrollYProgress, [0, 0.40, 0.55, 0.68], [0, 0, 50, 160]);
+    const clipPath = useTransform(clipRadius, (r: number) => `circle(${r}% at 50% 54%)`);
     // Text fades out — extended to stay visible longer (gone ~25%)
     const textScale = useTransform(scrollYProgress, [0, 0.25], [1, 1.04]);
     const textOpacity = useTransform(scrollYProgress, [0.05, 0.25], [1, 0]);
