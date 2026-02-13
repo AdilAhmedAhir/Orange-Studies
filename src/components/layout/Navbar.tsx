@@ -75,11 +75,11 @@ export function Navbar() {
              * FULL-WIDTH NAVBAR — always visible at top, fades out when pill appears
              * ════════════════════════════════════════════════════ */}
             <header
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${showPill
-                    ? "pointer-events-none -translate-y-full opacity-0"
+                className={`absolute top-0 left-0 right-0 z-50 lg:fixed transition-all duration-500 ${showPill
+                    ? "lg:pointer-events-none lg:-translate-y-full lg:opacity-0"
                     : "translate-y-0 opacity-100"
                     } ${isScrolled && !showPill
-                        ? "bg-neutral-900/80 backdrop-blur-xl shadow-lg shadow-black/10"
+                        ? "lg:bg-neutral-900/80 lg:backdrop-blur-xl lg:shadow-lg lg:shadow-black/10"
                         : "bg-transparent"
                     }`}
             >
