@@ -217,8 +217,8 @@ export default function LoginPage() {
                 {/* Staff / Partner ghost link */}
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
                     className="mt-8 text-center">
-                    <Link href="/staff-login" className="text-xs text-neutral-400 transition-colors hover:text-brand-purple">
-                        Are you a Partner or Admin? <span className="font-semibold underline underline-offset-2">Log in here</span>
+                    <Link href="/admin/login" className="text-xs text-neutral-400 transition-colors hover:text-brand-purple">
+                        Admin &amp; Manager Portal? <span className="font-semibold underline underline-offset-2">Log in here</span>
                     </Link>
                 </motion.div>
             </div>

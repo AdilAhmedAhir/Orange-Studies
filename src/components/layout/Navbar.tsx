@@ -49,7 +49,7 @@ const pillLinks: { name: string; href: string }[] = [
 
 export function Navbar() {
     const pathname = usePathname();
-    const isPortal = pathname.startsWith('/dashboard') || pathname.startsWith('/login') || pathname.startsWith('/staff-login') || pathname.startsWith('/apply');
+    const isPortal = pathname.startsWith('/dashboard') || pathname.startsWith('/login') || pathname.startsWith('/admin') || pathname.startsWith('/apply');
 
     const [isScrolled, setIsScrolled] = useState(false);
     const [showPill, setShowPill] = useState(false);
