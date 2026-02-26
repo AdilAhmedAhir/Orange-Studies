@@ -1,0 +1,239 @@
+// ============================================
+// Orange Studies — Prisma Database Schema
+// Maps to mock-data.ts interfaces for production
+// ============================================
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Enums ──
+
+enum UserRole {
+  STUDENT
+  ADMIN
+  MANAGER
+}
+
+enum DegreeLevel {
+  Bachelor
+  Master
+  PhD
+  Diploma
+}
+
+enum StudyMode {
+  FULL_TIME
+  PART_TIME
+  BOTH
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  OFFER_RECEIVED
+  OFFER_ACCEPTED
+  VISA_PROCESSING
+  ENROLLED
+  REJECTED
+  WITHDRAWN
+}
+
+enum DocumentStatus {
+  PENDING
+  UPLOADED
+  VERIFIED
+  REJECTED
+}
+
+// ── User ──
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  role          UserRole  @default(STUDENT)
+  fullName      String
+  phone         String?
+  dateOfBirth   DateTime?
+  nationality   String?
+  city          String?
+  avatarUrl     String?
+
+  // Academic background
+  highestQualification String?
+  previousInstitution  String?
+  gpa                  String?
+  ieltsScore           String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  applications  Application[]
+  documents     Document[]
+
+  @@map("users")
+}
+
+// ── Country ──
+
+model Country {
+  id    String @id @default(cuid())
+  name  String @unique
+  code  String @unique
+  flag  String
+
+  universities University[]
+
+  @@map("countries")
+}
+
+// ── University ──
+
+model University {
+  id                  String  @id @default(cuid())
+  slug                String  @unique
+  name                String
+  location            String
+  ranking             Int?
+  logoUrl             String?
+  description         String
+  detailedDescription String?
+
+  // Tuition range
+  tuitionMin      Int?
+  tuitionMax      Int?
+  tuitionCurrency String @default("GBP")
+
+  // Extended info
+  highlights            String[]
+  facilities            String[]
+  campusLife            String?
+  admissionRequirements String[]
+  accommodationInfo     String?
+  colorAccent           String?
+
+  countryId String
+  country   Country @relation(fields: [countryId], references: [id])
+
+  programs     Program[]
+  applications Application[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("universities")
+}
+
+// ── Program (Course) ──
+
+model Program {
+  id                   String      @id @default(cuid())
+  slug                 String      @unique
+  title                String
+  level                DegreeLevel
+  duration             String
+  tuitionFee           Int
+  currency             String      @default("GBP")
+  description          String
+  detailedDescription  String?
+  studyMode            StudyMode   @default(FULL_TIME)
+  scholarshipAvailable Boolean     @default(false)
+  applicationDeadline  String?
+
+  // Array fields
+  intakeDates       String[]
+  modules           String[]
+  entryRequirements String[]
+  careerOutcomes    String[]
+
+  universityId String
+  university   University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  applications Application[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("programs")
+}
+
+// ── Application ──
+
+model Application {
+  id        String            @id @default(cuid())
+  refCode   String            @unique @default(cuid())
+  status    ApplicationStatus @default(DRAFT)
+  progress  Int               @default(0)
+
+  // Personal info snapshot
+  fullName        String?
+  email           String?
+  phone           String?
+  nationality     String?
+  previousDegree  String?
+
+  submittedAt DateTime?
+  lastUpdatedAt DateTime @default(now())
+
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  programId    String
+  program      Program    @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  universityId String
+  university   University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  documents    Document[]
+  timeline     TimelineStep[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("applications")
+}
+
+// ── Timeline Step ──
+
+model TimelineStep {
+  id     String  @id @default(cuid())
+  step   String
+  date   String?
+  done   Boolean @default(false)
+  active Boolean @default(false)
+  order  Int
+
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("timeline_steps")
+}
+
+// ── Document ──
+
+model Document {
+  id       String         @id @default(cuid())
+  name     String
+  status   DocumentStatus @default(PENDING)
+  fileUrl  String?
+  fileSize Int?
+  mimeType String?
+
+  userId        String
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+
+  uploadedAt DateTime @default(now())
+  verifiedAt DateTime?
+
+  @@map("documents")
+}
