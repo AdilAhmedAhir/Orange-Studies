@@ -21,6 +21,8 @@
 | 2026-02-26 | Phase 7 | Scope reduction: Deleted `/staff-login`, `/dashboard/recruiter`, `/dashboard/institution`. Created `/admin/login` (deep purple theme, Admin/Manager toggle). Updated login ghost link → `/admin/login`. Updated Navbar/Footer guards to include `/admin`, removed `/staff-login`. | `admin/login/page.tsx`, `login/page.tsx`, `Navbar.tsx`, `Footer.tsx` | Phase 8 |
 | 2026-02-26 | Phase 8 | Built Adventus-style `/search` with split-pane layout (sidebar filters + result grid). URL state via `useSearchParams` for Country, Degree Level, Discipline, text query. Animated result cards with Apply Now CTA. Accordion filters, active tags, empty state. | `search/page.tsx` | Phase 9 |
 | 2026-02-26 | Phase 9 | Backend init: Installed Prisma ORM + @prisma/client. Ran `prisma init`. Architected PostgreSQL schema — 7 models (User, Country, University, Program, Application, TimelineStep, Document), 5 enums (UserRole, DegreeLevel, StudyMode, ApplicationStatus, DocumentStatus). Created `.env.example` template. | `prisma/schema.prisma`, `prisma.config.ts`, `.env.example`, `package.json` | Phase 10 (Supabase connect) |
+| 2026-02-26 | Phase 10 | Configured Supabase PostgreSQL connection in `.env` (gitignored). Set DATABASE_URL, SUPABASE_URL, ANON_KEY. Validated Prisma schema against connection — valid. No migrations executed yet. | `.env` (gitignored), `.env.example` | Phase 11 (db push + NextAuth) |
+
 
 
 
