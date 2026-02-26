@@ -3,10 +3,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import {
     ArrowRight, Eye, EyeOff, Mail, Lock, User, Phone,
-    GraduationCap,
+    GraduationCap, AlertTriangle,
 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
 
@@ -15,6 +16,7 @@ export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
 
     // Form state
     const [form, setForm] = useState({
@@ -27,12 +29,23 @@ export default function LoginPage() {
     const updateForm = (field: string, value: string) =>
         setForm((prev) => ({ ...prev, [field]: value }));
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setTimeout(() => {
+        setError("");
+
+        const res = await signIn("credentials", {
+            redirect: false,
+            email: form.email,
+            password: form.password,
+        });
+
+        if (res?.error) {
+            setError("Invalid email or password.");
+            setIsLoading(false);
+        } else if (res?.ok) {
             router.push("/dashboard/student");
-        }, 1200);
+        }
     };
 
     return (
@@ -208,10 +221,19 @@ export default function LoginPage() {
                     </AnimatePresence>
                 </motion.form>
 
+                {/* Error Banner */}
+                {error && (
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                        className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-xs font-semibold text-red-600">
+                        <AlertTriangle className="h-4 w-4 shrink-0" />
+                        {error}
+                    </motion.div>
+                )}
+
                 {/* Demo Notice */}
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
                     className="mt-4 text-center text-[10px] text-neutral-400">
-                    🔒 This is a demo — no real authentication. Click sign in to explore the dashboard.
+                    🔒 Sign in with your registered credentials.
                 </motion.p>
 
                 {/* Staff / Partner ghost link */}

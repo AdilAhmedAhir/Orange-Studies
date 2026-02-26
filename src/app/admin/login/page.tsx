@@ -3,8 +3,9 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { ArrowRight, Eye, EyeOff, Mail, Lock, Shield, UserCog } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Mail, Lock, Shield, UserCog, AlertTriangle } from "lucide-react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
 
 const roles = [
@@ -17,13 +18,27 @@ export default function AdminLoginPage() {
     const [selectedRole, setSelectedRole] = useState("admin");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setTimeout(() => router.push("/dashboard/admin"), 1200);
+        setError("");
+
+        const res = await signIn("credentials", {
+            redirect: false,
+            email,
+            password,
+        });
+
+        if (res?.error) {
+            setError("Invalid credentials.");
+            setIsLoading(false);
+        } else if (res?.ok) {
+            router.push("/dashboard/admin");
+        }
     };
 
     return (
@@ -101,8 +116,16 @@ export default function AdminLoginPage() {
                     </motion.button>
                 </motion.form>
 
+                {error && (
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                        className="mt-4 flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-xs font-semibold text-red-400">
+                        <AlertTriangle className="h-4 w-4 shrink-0" />
+                        {error}
+                    </motion.div>
+                )}
+
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="mt-4 text-center text-[10px] text-white/25">
-                    🔒 Demo — no real authentication.
+                    🔒 Authorized personnel only.
                 </motion.p>
 
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-6 text-center">
