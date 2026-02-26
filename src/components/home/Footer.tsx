@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LogoIcon } from "@/components/ui/LogoIcon";
 import { useScrollReveal, staggerContainer } from "@/hooks/useScrollReveal";
 import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Youtube } from "lucide-react";
@@ -36,7 +37,12 @@ const socials = [
 ];
 
 export function Footer() {
+    const pathname = usePathname();
+    const isPortal = pathname.startsWith('/dashboard') || pathname.startsWith('/login') || pathname.startsWith('/staff-login') || pathname.startsWith('/apply');
+
     const { ref, isInView } = useScrollReveal({ preset: "fade-up" });
+
+    if (isPortal) return null;
 
     return (
         <footer className="relative z-10 bg-neutral-900 text-neutral-300">

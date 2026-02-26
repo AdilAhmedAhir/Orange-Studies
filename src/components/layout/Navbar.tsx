@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LogoIcon } from "@/components/ui/LogoIcon";
 
 interface NavChild {
@@ -47,9 +48,14 @@ const pillLinks: { name: string; href: string }[] = [
 ];
 
 export function Navbar() {
+    const pathname = usePathname();
+    const isPortal = pathname.startsWith('/dashboard') || pathname.startsWith('/login') || pathname.startsWith('/staff-login') || pathname.startsWith('/apply');
+
     const [isScrolled, setIsScrolled] = useState(false);
     const [showPill, setShowPill] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+    if (isPortal) return null;
 
     useEffect(() => {
         const handleScroll = () => {

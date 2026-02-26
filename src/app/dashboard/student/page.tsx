@@ -159,7 +159,10 @@ export default function StudentDashboard() {
                                 <p className="truncate text-[10px] text-neutral-400">adil@example.com</p>
                             </div>
                         </div>
-                        <Link href="/login" className="mt-2 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium text-neutral-400 hover:bg-red-50 hover:text-red-500 transition-colors">
+                        <Link href="/" className="mt-2 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors">
+                            <ArrowRight className="h-4 w-4 rotate-180" /> Back to Website
+                        </Link>
+                        <Link href="/login" className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium text-neutral-400 hover:bg-red-50 hover:text-red-500 transition-colors">
                             <LogOut className="h-4 w-4" /> Sign Out
                         </Link>
                     </div>
