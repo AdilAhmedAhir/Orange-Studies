@@ -9,8 +9,11 @@ import {
     LogOut, ChevronRight, Clock, CheckCircle, AlertCircle,
     Eye, ArrowRight, GraduationCap,
     Sparkles, Menu, X, MessageCircle, Mail, Search,
+    RotateCcw, Loader2,
 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
+import { reuploadDocument } from "@/app/actions/admin";
+import { uploadFile } from "@/app/actions/upload";
 
 /* ── Types ── */
 interface AppData {
@@ -28,10 +31,13 @@ interface AppData {
 }
 
 interface DocData {
+    id: string;
     name: string;
     status: string;
     fileUrl: string;
     date: string;
+    requiresReupload: boolean;
+    adminFeedback: string;
 }
 
 interface UserData {
@@ -61,11 +67,32 @@ export default function StudentDashboardClient({
     const [activeTab, setActiveTab] = useState<Tab>("overview");
     const [expandedApp, setExpandedApp] = useState<string | null>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [reuploadingDoc, setReuploadingDoc] = useState<string | null>(null);
+    const [reuploadProgress, setReuploadProgress] = useState<Record<string, boolean>>({});
 
     const hasApps = applications.length > 0;
     const offerCount = applications.filter((a) => a.status === "offer-received" || a.status === "offer-accepted").length;
     const verifiedDocs = documents.filter((d) => d.status === "verified").length;
-    const pendingActions = documents.filter((d) => d.status !== "verified").length;
+    const reuploadCount = documents.filter((d) => d.requiresReupload).length;
+    const pendingActions = documents.filter((d) => d.status !== "verified").length + reuploadCount;
+
+    const handleReupload = async (docId: string, file: File) => {
+        setReuploadProgress((prev) => ({ ...prev, [docId]: true }));
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            const result = await uploadFile(formData);
+            const reupResult = await reuploadDocument(docId, result.url, file.name);
+            if (!reupResult.success) {
+                alert(reupResult.error || "Re-upload failed.");
+            }
+            setReuploadingDoc(null);
+        } catch {
+            alert("Upload failed. Please try again.");
+        } finally {
+            setReuploadProgress((prev) => ({ ...prev, [docId]: false }));
+        }
+    };
 
     return (
         <div className="flex min-h-screen bg-neutral-50">
@@ -394,40 +421,81 @@ export default function StudentDashboardClient({
                                         <div className="grid gap-3 sm:grid-cols-2">
                                             {documents.map((doc, i) => (
                                                 <motion.div key={doc.name + i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                                                    className="group flex items-center justify-between rounded-2xl border border-neutral-200/60 bg-white p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${doc.status === "verified" ? "bg-emerald-100" : doc.status === "pending" ? "bg-amber-100" : "bg-neutral-100"
-                                                            }`}>
-                                                            {doc.status === "verified" ? <CheckCircle className="h-5 w-5 text-emerald-600" /> :
-                                                                doc.status === "pending" ? <Clock className="h-5 w-5 text-amber-600" /> :
-                                                                    <Upload className="h-5 w-5 text-neutral-400" />}
+                                                    className="group rounded-2xl border border-neutral-200/60 bg-white p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${doc.status === "verified" ? "bg-emerald-100" : doc.status === "pending" ? "bg-amber-100" : "bg-neutral-100"
+                                                                }`}>
+                                                                {doc.status === "verified" ? <CheckCircle className="h-5 w-5 text-emerald-600" /> :
+                                                                    doc.status === "pending" ? <Clock className="h-5 w-5 text-amber-600" /> :
+                                                                        <Upload className="h-5 w-5 text-neutral-400" />}
+                                                            </div>
+                                                            <div>
+                                                                {doc.fileUrl ? (
+                                                                    <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-neutral-800 hover:text-brand-purple hover:underline transition-colors">{doc.name}</a>
+                                                                ) : (
+                                                                    <p className="text-sm font-semibold text-neutral-800">{doc.name}</p>
+                                                                )}
+                                                                <p className="text-xs text-neutral-400">
+                                                                    {doc.status === "verified" ? `Verified • ${doc.date}` : doc.status === "pending" ? "Under Review" : "Not uploaded"}
+                                                                </p>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            {doc.fileUrl ? (
-                                                                <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-neutral-800 hover:text-brand-purple hover:underline transition-colors">{doc.name}</a>
-                                                            ) : (
-                                                                <p className="text-sm font-semibold text-neutral-800">{doc.name}</p>
-                                                            )}
-                                                            <p className="text-xs text-neutral-400">
-                                                                {doc.status === "verified" ? `Verified • ${doc.date}` : doc.status === "pending" ? "Under Review" : "Not uploaded"}
-                                                            </p>
-                                                        </div>
+                                                        {doc.fileUrl && (
+                                                            <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="shrink-0 flex items-center gap-1 rounded-lg bg-brand-purple/10 px-3 py-1.5 text-xs font-bold text-brand-purple transition-all hover:bg-brand-purple hover:text-white">
+                                                                <Eye className="h-3 w-3" /> View
+                                                            </a>
+                                                        )}
+                                                        {!doc.fileUrl && doc.status === "missing" && !doc.requiresReupload && (
+                                                            <button className="shrink-0 rounded-lg bg-brand-orange/10 px-3 py-1.5 text-xs font-bold text-brand-orange transition-all hover:bg-brand-orange hover:text-white">
+                                                                Upload
+                                                            </button>
+                                                        )}
+                                                        {doc.status === "verified" && !doc.requiresReupload && (
+                                                            <span className="shrink-0 text-[10px] font-bold text-emerald-600">✓ Verified</span>
+                                                        )}
+                                                        {doc.status === "pending" && !doc.requiresReupload && (
+                                                            <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">Pending</span>
+                                                        )}
                                                     </div>
-                                                    {doc.fileUrl && (
-                                                        <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="shrink-0 flex items-center gap-1 rounded-lg bg-brand-purple/10 px-3 py-1.5 text-xs font-bold text-brand-purple transition-all hover:bg-brand-purple hover:text-white">
-                                                            <Eye className="h-3 w-3" /> View
-                                                        </a>
-                                                    )}
-                                                    {!doc.fileUrl && doc.status === "missing" && (
-                                                        <button className="shrink-0 rounded-lg bg-brand-orange/10 px-3 py-1.5 text-xs font-bold text-brand-orange transition-all hover:bg-brand-orange hover:text-white">
-                                                            Upload
-                                                        </button>
-                                                    )}
-                                                    {doc.status === "verified" && (
-                                                        <span className="shrink-0 text-[10px] font-bold text-emerald-600">✓ Verified</span>
-                                                    )}
-                                                    {doc.status === "pending" && (
-                                                        <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">Pending</span>
+
+                                                    {/* Re-upload Required Banner */}
+                                                    {doc.requiresReupload && (
+                                                        <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-4">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <RotateCcw className="h-3.5 w-3.5 text-red-500" />
+                                                                <p className="text-xs font-bold text-red-600">Re-upload Required</p>
+                                                            </div>
+                                                            {doc.adminFeedback && (
+                                                                <p className="text-xs text-red-500 mb-3 italic">&quot;{doc.adminFeedback}&quot;</p>
+                                                            )}
+                                                            {reuploadingDoc === doc.id ? (
+                                                                <div className="relative">
+                                                                    <input
+                                                                        type="file"
+                                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp"
+                                                                        onChange={(e) => {
+                                                                            const file = e.target.files?.[0];
+                                                                            if (file) handleReupload(doc.id, file);
+                                                                        }}
+                                                                        className="block w-full text-xs text-neutral-600 file:mr-2 file:rounded-lg file:border-0 file:bg-brand-orange file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white hover:file:bg-brand-orange-dark"
+                                                                        disabled={!!reuploadProgress[doc.id]}
+                                                                    />
+                                                                    {reuploadProgress[doc.id] && (
+                                                                        <div className="mt-2 flex items-center gap-2 text-xs text-brand-purple">
+                                                                            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading...
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <button
+                                                                    onClick={() => setReuploadingDoc(doc.id)}
+                                                                    className="w-full rounded-lg bg-red-500 px-4 py-2 text-xs font-bold text-white transition-all hover:bg-red-600"
+                                                                >
+                                                                    Choose New File
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     )}
                                                 </motion.div>
                                             ))}
@@ -487,7 +555,7 @@ export default function StudentDashboardClient({
                         )}
                     </AnimatePresence>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     );
 }

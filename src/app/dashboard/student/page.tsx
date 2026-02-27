@@ -62,10 +62,13 @@ export default async function StudentDashboardPage() {
     }));
 
     const serializedDocs = documents.map((doc) => ({
+        id: doc.id,
         name: doc.name,
         status: doc.status.toLowerCase(),
         fileUrl: doc.fileUrl || "",
         date: doc.updatedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        requiresReupload: doc.requiresReupload,
+        adminFeedback: doc.adminFeedback || "",
     }));
 
     const userData = {

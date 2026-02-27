@@ -60,6 +60,12 @@ export default async function AdminApplicationDetailPage({ params }: PageProps) 
         where: { userId: application.user.id },
     });
 
+    // Fetch audit logs for this application
+    const auditLogs = await prisma.auditLog.findMany({
+        where: { applicationId: id },
+        orderBy: { createdAt: "desc" },
+    });
+
     const serialized = {
         id: application.id,
         refCode: application.refCode,
@@ -99,6 +105,15 @@ export default async function AdminApplicationDetailPage({ params }: PageProps) 
             fileUrl: doc.fileUrl || "",
             status: doc.status,
             date: doc.updatedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+            requiresReupload: doc.requiresReupload,
+            adminFeedback: doc.adminFeedback || "",
+        })),
+        auditLogs: auditLogs.map((log) => ({
+            id: log.id,
+            action: log.action,
+            userEmail: log.userEmail,
+            details: log.details || "",
+            createdAt: log.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" }),
         })),
     };
 

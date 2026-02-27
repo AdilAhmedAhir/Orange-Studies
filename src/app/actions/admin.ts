@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { del } from "@vercel/blob";
 
 const VALID_STATUSES = [
     "SUBMITTED",
@@ -55,6 +56,8 @@ export async function updateApplicationStatus(
         return { success: false, error: "Application not found." };
     }
 
+    const oldStatus = app.status;
+
     await prisma.application.update({
         where: { id: applicationId },
         data: {
@@ -62,6 +65,14 @@ export async function updateApplicationStatus(
             progress: PROGRESS_MAP[newStatus] ?? app.progress,
         },
     });
+
+    // Write audit log
+    await logActivity(
+        applicationId,
+        session.user.email,
+        "STATUS_CHANGED",
+        `Status changed from ${oldStatus} to ${newStatus}`
+    );
 
     revalidatePath("/dashboard/admin");
     revalidatePath("/dashboard/student");
@@ -200,6 +211,134 @@ export async function createProgram(
         return { success: true };
     } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Failed to create program.";
+        return { success: false, error: msg };
+    }
+}
+
+/* ─────────────────────────────────────────────────────
+   REUSABLE AUDIT LOGGER
+   ───────────────────────────────────────────────────── */
+export async function logActivity(
+    applicationId: string,
+    userEmail: string,
+    action: string,
+    details?: string
+) {
+    await prisma.auditLog.create({
+        data: { applicationId, userEmail, action, details },
+    });
+}
+
+/* ─────────────────────────────────────────────────────
+   REQUEST DOCUMENT RE-UPLOAD
+   ───────────────────────────────────────────────────── */
+export async function requestDocReupload(
+    docId: string,
+    feedback: string,
+    applicationId: string
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        const admin = await requireAdmin();
+        if (!admin) return { success: false, error: "Unauthorized." };
+
+        const doc = await prisma.document.findUnique({ where: { id: docId } });
+        if (!doc) return { success: false, error: "Document not found." };
+
+        await prisma.document.update({
+            where: { id: docId },
+            data: {
+                requiresReupload: true,
+                adminFeedback: feedback.trim(),
+                status: "PENDING",
+            },
+        });
+
+        await logActivity(
+            applicationId,
+            admin.email,
+            "REUPLOAD_REQUESTED",
+            `Re-upload requested for "${doc.name}": ${feedback.trim()}`
+        );
+
+        revalidatePath("/dashboard/admin");
+        revalidatePath("/dashboard/student");
+        revalidatePath(`/dashboard/admin/application/${applicationId}`);
+        return { success: true };
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Failed to request re-upload.";
+        return { success: false, error: msg };
+    }
+}
+
+/* ─────────────────────────────────────────────────────
+   DELETE DOCUMENT
+   ───────────────────────────────────────────────────── */
+export async function deleteDocument(
+    docId: string,
+    applicationId: string
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        const admin = await requireAdmin();
+        if (!admin) return { success: false, error: "Unauthorized." };
+
+        const doc = await prisma.document.findUnique({ where: { id: docId } });
+        if (!doc) return { success: false, error: "Document not found." };
+
+        // Delete from Vercel Blob if URL exists
+        if (doc.fileUrl) {
+            try { await del(doc.fileUrl); } catch { /* blob may already be gone */ }
+        }
+
+        await prisma.document.delete({ where: { id: docId } });
+
+        await logActivity(
+            applicationId,
+            admin.email,
+            "DOCUMENT_DELETED",
+            `Deleted document "${doc.name}"${doc.fileName ? ` (${doc.fileName})` : ""}`
+        );
+
+        revalidatePath("/dashboard/admin");
+        revalidatePath("/dashboard/student");
+        revalidatePath(`/dashboard/admin/application/${applicationId}`);
+        return { success: true };
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Failed to delete document.";
+        return { success: false, error: msg };
+    }
+}
+
+/* ─────────────────────────────────────────────────────
+   REUPLOAD DOCUMENT (Student-side)
+   ───────────────────────────────────────────────────── */
+export async function reuploadDocument(
+    docId: string,
+    newUrl: string,
+    newFileName: string
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.email) return { success: false, error: "Unauthorized." };
+
+        const doc = await prisma.document.findUnique({ where: { id: docId } });
+        if (!doc) return { success: false, error: "Document not found." };
+
+        await prisma.document.update({
+            where: { id: docId },
+            data: {
+                fileUrl: newUrl,
+                fileName: newFileName,
+                requiresReupload: false,
+                adminFeedback: null,
+                status: "PENDING",
+            },
+        });
+
+        revalidatePath("/dashboard/student");
+        revalidatePath("/dashboard/admin");
+        return { success: true };
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Failed to re-upload document.";
         return { success: false, error: msg };
     }
 }

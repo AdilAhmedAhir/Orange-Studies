@@ -1,15 +1,16 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import {
     ArrowLeft, User, GraduationCap, FileText, Clock, CheckCircle,
     AlertCircle, Eye, Building2, Calendar, Mail, Phone, MapPin,
-    Globe, Loader2, ChevronDown, Shield,
+    Globe, Loader2, ChevronDown, Shield, Download, Trash2,
+    RotateCcw, History, X,
 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
-import { updateApplicationStatus } from "@/app/actions/admin";
+import { updateApplicationStatus, requestDocReupload, deleteDocument } from "@/app/actions/admin";
 
 /* ── Types ── */
 interface AppData {
@@ -46,6 +47,15 @@ interface AppData {
         fileUrl: string;
         status: string;
         date: string;
+        requiresReupload: boolean;
+        adminFeedback: string;
+    }[];
+    auditLogs: {
+        id: string;
+        action: string;
+        userEmail: string;
+        details: string;
+        createdAt: string;
     }[];
 }
 
@@ -59,6 +69,14 @@ const STATUS_OPTIONS = [
     { value: "REJECTED", label: "Rejected", color: "bg-red-100 text-red-700 border-red-200" },
 ];
 
+const ACTION_LABELS: Record<string, { label: string; color: string }> = {
+    STATUS_CHANGED: { label: "Status Changed", color: "bg-blue-100 text-blue-700" },
+    REUPLOAD_REQUESTED: { label: "Re-upload Requested", color: "bg-amber-100 text-amber-700" },
+    DOCUMENT_DELETED: { label: "Document Deleted", color: "bg-red-100 text-red-700" },
+    DOCUMENT_UPLOADED: { label: "Document Uploaded", color: "bg-emerald-100 text-emerald-700" },
+    NOTE_ADDED: { label: "Note Added", color: "bg-neutral-100 text-neutral-700" },
+};
+
 function getStatusStyle(status: string) {
     return STATUS_OPTIONS.find((s) => s.value === status) || STATUS_OPTIONS[0];
 }
@@ -67,6 +85,10 @@ export default function AdminApplicationClient({ application }: { application: A
     const [currentStatus, setCurrentStatus] = useState(application.status);
     const [updating, setUpdating] = useState(false);
     const [statusMessage, setStatusMessage] = useState("");
+    const [docActions, setDocActions] = useState<Record<string, boolean>>({});
+    const [reuploadModal, setReuploadModal] = useState<{ docId: string; docName: string } | null>(null);
+    const [reuploadFeedback, setReuploadFeedback] = useState("");
+    const [reuploadLoading, setReuploadLoading] = useState(false);
 
     const handleStatusChange = async (newStatus: string) => {
         if (newStatus === currentStatus) return;
@@ -85,6 +107,37 @@ export default function AdminApplicationClient({ application }: { application: A
         } finally {
             setUpdating(false);
             setTimeout(() => setStatusMessage(""), 3000);
+        }
+    };
+
+    const handleDeleteDoc = async (docId: string) => {
+        if (!confirm("Delete this document permanently? This cannot be undone.")) return;
+        setDocActions((prev) => ({ ...prev, [docId]: true }));
+        try {
+            const result = await deleteDocument(docId, application.id);
+            if (!result.success) alert(result.error || "Delete failed.");
+        } catch {
+            alert("Failed to delete document.");
+        } finally {
+            setDocActions((prev) => ({ ...prev, [docId]: false }));
+        }
+    };
+
+    const handleRequestReupload = async () => {
+        if (!reuploadModal || !reuploadFeedback.trim()) return;
+        setReuploadLoading(true);
+        try {
+            const result = await requestDocReupload(reuploadModal.docId, reuploadFeedback, application.id);
+            if (result.success) {
+                setReuploadModal(null);
+                setReuploadFeedback("");
+            } else {
+                alert(result.error || "Failed.");
+            }
+        } catch {
+            alert("An error occurred.");
+        } finally {
+            setReuploadLoading(false);
         }
     };
 
@@ -256,6 +309,46 @@ export default function AdminApplicationClient({ application }: { application: A
                                 ))}
                             </div>
                         </motion.div>
+
+                        {/* ─── Activity History ─── */}
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+                            className="rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm">
+                            <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
+                                <History className="h-5 w-5 text-brand-purple" /> Activity History
+                            </h3>
+
+                            {application.auditLogs.length > 0 ? (
+                                <div className="mt-4 space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                                    {application.auditLogs.map((log) => {
+                                        const actionStyle = ACTION_LABELS[log.action] || { label: log.action, color: "bg-neutral-100 text-neutral-700" };
+                                        return (
+                                            <div key={log.id} className="flex items-start gap-3 rounded-xl bg-neutral-50 p-4">
+                                                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-purple/10">
+                                                    <History className="h-4 w-4 text-brand-purple" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${actionStyle.color}`}>
+                                                            {actionStyle.label}
+                                                        </span>
+                                                        <span className="text-[10px] text-neutral-400">{log.createdAt}</span>
+                                                    </div>
+                                                    <p className="mt-1 text-xs text-neutral-500">by <span className="font-semibold text-neutral-700">{log.userEmail}</span></p>
+                                                    {log.details && (
+                                                        <p className="mt-1 text-xs text-neutral-600">{log.details}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="mt-4 flex flex-col items-center py-8 text-center">
+                                    <History className="h-8 w-8 text-neutral-300" />
+                                    <p className="mt-2 text-sm text-neutral-400">No activity recorded yet.</p>
+                                </div>
+                            )}
+                        </motion.div>
                     </div>
 
                     {/* ─── RIGHT COLUMN ─── */}
@@ -287,19 +380,56 @@ export default function AdminApplicationClient({ application }: { application: A
                                                     </div>
                                                 </div>
                                             </div>
-                                            {doc.fileUrl && (
-                                                <a
-                                                    href={doc.fileUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="mt-3 flex items-center justify-center gap-2 rounded-lg bg-brand-purple/10 px-4 py-2 text-xs font-bold text-brand-purple transition-all hover:bg-brand-purple hover:text-white"
-                                                >
-                                                    <Eye className="h-3.5 w-3.5" /> View Document
-                                                </a>
+
+                                            {/* Re-upload badge */}
+                                            {doc.requiresReupload && (
+                                                <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+                                                    <p className="text-[10px] font-bold text-amber-700 flex items-center gap-1">
+                                                        <RotateCcw className="h-3 w-3" /> Re-upload Requested
+                                                    </p>
+                                                    {doc.adminFeedback && (
+                                                        <p className="mt-1 text-[10px] text-amber-600 italic">&quot;{doc.adminFeedback}&quot;</p>
+                                                    )}
+                                                </div>
                                             )}
-                                            {!doc.fileUrl && doc.status === "MISSING" && (
+
+                                            {/* Action buttons */}
+                                            {doc.fileUrl ? (
+                                                <div className="mt-3 flex items-center gap-2">
+                                                    <a
+                                                        href={doc.fileUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-purple/10 px-3 py-2 text-[11px] font-bold text-brand-purple transition-all hover:bg-brand-purple hover:text-white"
+                                                    >
+                                                        <Eye className="h-3 w-3" /> View
+                                                    </a>
+                                                    <a
+                                                        href={doc.fileUrl}
+                                                        download={doc.fileName || doc.name}
+                                                        className="flex items-center justify-center gap-1.5 rounded-lg bg-neutral-100 px-3 py-2 text-[11px] font-bold text-neutral-600 transition-all hover:bg-neutral-200"
+                                                    >
+                                                        <Download className="h-3 w-3" />
+                                                    </a>
+                                                    <button
+                                                        onClick={() => setReuploadModal({ docId: doc.id, docName: doc.name })}
+                                                        className="flex items-center justify-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-[11px] font-bold text-amber-600 transition-all hover:bg-amber-100"
+                                                        title="Request Re-upload"
+                                                    >
+                                                        <RotateCcw className="h-3 w-3" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteDoc(doc.id)}
+                                                        disabled={!!docActions[doc.id]}
+                                                        className="flex items-center justify-center gap-1.5 rounded-lg bg-red-50 px-3 py-2 text-[11px] font-bold text-red-500 transition-all hover:bg-red-100 disabled:opacity-50"
+                                                        title="Delete Document"
+                                                    >
+                                                        {docActions[doc.id] ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+                                                    </button>
+                                                </div>
+                                            ) : doc.status === "MISSING" ? (
                                                 <p className="mt-3 text-center text-[10px] text-neutral-400 italic">Not uploaded by student</p>
-                                            )}
+                                            ) : null}
                                         </div>
                                     ))}
                                 </div>
@@ -353,6 +483,56 @@ export default function AdminApplicationClient({ application }: { application: A
                     </div>
                 </div>
             </div>
+
+            {/* ─── Re-upload Feedback Modal ─── */}
+            <AnimatePresence>
+                {reuploadModal && (
+                    <>
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px]"
+                            onClick={() => { setReuploadModal(null); setReuploadFeedback(""); }}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl"
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-lg font-bold text-neutral-900 font-[family-name:var(--font-heading)]">Request Re-upload</h3>
+                                <button onClick={() => { setReuploadModal(null); setReuploadFeedback(""); }}>
+                                    <X className="h-5 w-5 text-neutral-400 hover:text-neutral-700" />
+                                </button>
+                            </div>
+                            <p className="text-sm text-neutral-500 mb-1">Document: <span className="font-semibold text-neutral-800">{reuploadModal.docName}</span></p>
+                            <p className="text-xs text-neutral-400 mb-4">Provide feedback explaining why the student needs to re-upload this document.</p>
+                            <textarea
+                                value={reuploadFeedback}
+                                onChange={(e) => setReuploadFeedback(e.target.value)}
+                                placeholder="e.g. Document is blurry, please upload a clearer scan..."
+                                rows={3}
+                                className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800 placeholder:text-neutral-400 focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20"
+                            />
+                            <div className="mt-4 flex gap-3">
+                                <button
+                                    onClick={() => { setReuploadModal(null); setReuploadFeedback(""); }}
+                                    className="flex-1 rounded-xl border border-neutral-200 px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-all hover:bg-neutral-50"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleRequestReupload}
+                                    disabled={!reuploadFeedback.trim() || reuploadLoading}
+                                    className="flex-1 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-amber-600 disabled:opacity-50 flex items-center justify-center gap-2"
+                                >
+                                    {reuploadLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                                    Send Request
+                                </button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
