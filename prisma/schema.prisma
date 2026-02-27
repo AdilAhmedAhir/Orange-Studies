@@ -37,10 +37,14 @@ model User {
 
 // ─── Catalog ─────────────────────────────────────────
 model Country {
-  id   String @id @default(cuid())
-  name String @unique
-  code String @unique
-  flag String
+  id          String   @id @default(cuid())
+  name        String   @unique
+  code        String   @unique
+  flag        String
+  slug        String?  @unique
+  description String?  @db.Text
+  image       String?  // URL to country hero image
+  createdAt   DateTime @default(now())
 
   universities University[]
 }
@@ -130,6 +134,7 @@ model Application {
   program   Program @relation(fields: [programId], references: [id])
 
   timeline TimelineStep[]
+  auditLogs AuditLog[]
 
   @@index([userId])
   @@index([programId])
@@ -157,18 +162,35 @@ enum DocumentStatus {
 }
 
 model Document {
-  id        String         @id @default(cuid())
-  name      String
-  fileName  String?
-  fileUrl   String?
-  status    DocumentStatus @default(MISSING)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  id              String         @id @default(cuid())
+  name            String
+  fileName        String?
+  fileUrl         String?
+  status          DocumentStatus @default(MISSING)
+  requiresReupload Boolean      @default(false)
+  adminFeedback   String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   userId String
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ─── Audit Logs ──────────────────────────────────────
+model AuditLog {
+  id            String      @id @default(cuid())
+  action        String      // e.g. STATUS_CHANGED, DOCUMENT_UPLOADED, NOTE_ADDED
+  userEmail     String      // who performed the action
+  details       String?     @db.Text
+  createdAt     DateTime    @default(now())
+
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@index([userEmail])
 }
 
 // ─── Lead Generation ─────────────────────────────────

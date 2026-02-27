@@ -22,6 +22,19 @@ export async function uploadFile(formData: FormData): Promise<{ url: string }> {
         throw new Error("File size exceeds 10MB limit.");
     }
 
+    // Allowed MIME types
+    const allowedTypes = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+    if (!allowedTypes.includes(file.type)) {
+        throw new Error("Invalid file type. Accepted: PDF, JPG, PNG, WebP, DOC, DOCX.");
+    }
+
     const uniqueName = `documents/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
 
     const blob = await put(uniqueName, file, { access: "public" });

@@ -18,7 +18,7 @@ interface DocumentDropzoneProps {
 export function DocumentDropzone({
     label,
     description,
-    accept = ".pdf,.doc,.docx,.jpg,.png",
+    accept = ".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp",
     required = true,
     onFileSelect,
     onUploadComplete,
@@ -189,7 +189,7 @@ export function DocumentDropzone({
                         <p className="mt-3 text-sm text-neutral-600">
                             <span className="font-semibold text-brand-purple">Click to browse</span> or drag and drop
                         </p>
-                        <p className="mt-1 text-xs text-neutral-400">PDF, DOC, DOCX, JPG, or PNG (max 10MB)</p>
+                        <p className="mt-1 text-xs text-neutral-400">PDF, DOC, JPG, PNG, or WebP (max 10MB)</p>
                         <input ref={inputRef} type="file" accept={accept} onChange={handleFileChange} className="hidden" />
                     </motion.div>
                 )}
