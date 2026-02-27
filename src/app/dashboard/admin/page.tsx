@@ -65,6 +65,21 @@ export default async function AdminDashboardPage() {
         date: app.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     }));
 
+    // Recent leads
+    const recentLeads = await prisma.lead.findMany({
+        take: 10,
+        orderBy: { createdAt: "desc" },
+    });
+
+    const serializedLeads = recentLeads.map((lead) => ({
+        id: lead.id,
+        name: lead.name,
+        email: lead.email,
+        type: lead.type,
+        status: lead.status,
+        date: lead.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    }));
+
     return (
         <AdminDashboardClient
             kpi={{
@@ -76,6 +91,7 @@ export default async function AdminDashboardPage() {
             }}
             statusBreakdown={statusBreakdown}
             recentApplications={serializedRecent}
+            recentLeads={serializedLeads}
             adminName={user.fullName}
         />
     );

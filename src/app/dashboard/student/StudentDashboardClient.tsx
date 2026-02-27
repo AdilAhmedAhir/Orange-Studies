@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import {
     LayoutDashboard, FileText, Upload, User, Calendar,
     LogOut, ChevronRight, Clock, CheckCircle, AlertCircle,
@@ -121,9 +122,9 @@ export default function StudentDashboardClient({
                         <Link href="/" className="mt-2 flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700 transition-colors">
                             <ArrowRight className="h-4 w-4 rotate-180" /> Back to Website
                         </Link>
-                        <Link href="/login" className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium text-neutral-400 hover:bg-red-50 hover:text-red-500 transition-colors">
+                        <button onClick={() => signOut({ callbackUrl: '/login' })} className="flex w-full items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium text-neutral-400 hover:bg-red-50 hover:text-red-500 transition-colors">
                             <LogOut className="h-4 w-4" /> Sign Out
-                        </Link>
+                        </button>
                     </div>
                 </div>
             </aside>

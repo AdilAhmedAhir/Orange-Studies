@@ -169,3 +169,17 @@ model Document {
 
   @@index([userId])
 }
+
+// ─── Lead Generation ─────────────────────────────────
+model Lead {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  type      String   // CONSULTATION_ONLINE, CONSULTATION_OFFLINE, CONTACT
+  branch    String?
+  date      String?
+  message   String?
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+}

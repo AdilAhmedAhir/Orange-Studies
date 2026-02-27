@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { Calendar, MapPin, Video, Phone, Clock, CheckCircle } from "lucide-react";
+import { Calendar, MapPin, Video, Phone, Clock, CheckCircle, Loader2 } from "lucide-react";
+import { submitLead } from "@/app/actions/lead";
 
 const timeSlots = [
     "10:00 AM",
@@ -29,10 +30,27 @@ export function ConsultationBooking() {
     const [method, setMethod] = useState<"video" | "whatsapp">("video");
     const [branch, setBranch] = useState("");
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSubmitted(true);
+        setLoading(true);
+        try {
+            await submitLead({
+                name,
+                email,
+                phone: phone || undefined,
+                type: mode === "online" ? "CONSULTATION_ONLINE" : "CONSULTATION_OFFLINE",
+                branch: mode === "offline" ? branch : undefined,
+                date: date && time ? `${date} ${time}` : date || undefined,
+            });
+            setSubmitted(true);
+        } catch {
+            // fallback
+            setSubmitted(true);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -104,8 +122,8 @@ export function ConsultationBooking() {
                                 type="button"
                                 onClick={() => setMode("online")}
                                 className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all duration-300 ${mode === "online"
-                                        ? "bg-white text-brand-purple shadow-sm"
-                                        : "text-neutral-500 hover:text-neutral-700"
+                                    ? "bg-white text-brand-purple shadow-sm"
+                                    : "text-neutral-500 hover:text-neutral-700"
                                     }`}
                             >
                                 <Video className="h-4 w-4" />
@@ -115,8 +133,8 @@ export function ConsultationBooking() {
                                 type="button"
                                 onClick={() => setMode("offline")}
                                 className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all duration-300 ${mode === "offline"
-                                        ? "bg-white text-brand-purple shadow-sm"
-                                        : "text-neutral-500 hover:text-neutral-700"
+                                    ? "bg-white text-brand-purple shadow-sm"
+                                    : "text-neutral-500 hover:text-neutral-700"
                                     }`}
                             >
                                 <MapPin className="h-4 w-4" />
@@ -164,8 +182,8 @@ export function ConsultationBooking() {
                                             type="button"
                                             onClick={() => setMethod("video")}
                                             className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-medium transition-all ${method === "video"
-                                                    ? "border-brand-purple bg-brand-purple/10 text-brand-purple"
-                                                    : "border-neutral-200 text-neutral-500"
+                                                ? "border-brand-purple bg-brand-purple/10 text-brand-purple"
+                                                : "border-neutral-200 text-neutral-500"
                                                 }`}
                                         >
                                             <Video className="h-4 w-4" /> Video Call
@@ -174,8 +192,8 @@ export function ConsultationBooking() {
                                             type="button"
                                             onClick={() => setMethod("whatsapp")}
                                             className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-medium transition-all ${method === "whatsapp"
-                                                    ? "border-brand-purple bg-brand-purple/10 text-brand-purple"
-                                                    : "border-neutral-200 text-neutral-500"
+                                                ? "border-brand-purple bg-brand-purple/10 text-brand-purple"
+                                                : "border-neutral-200 text-neutral-500"
                                                 }`}
                                         >
                                             <Phone className="h-4 w-4" /> WhatsApp
@@ -197,14 +215,14 @@ export function ConsultationBooking() {
                                                 type="button"
                                                 onClick={() => setBranch(b.name)}
                                                 className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-all ${branch === b.name
-                                                        ? "border-brand-purple bg-brand-purple/10"
-                                                        : "border-neutral-200 hover:border-neutral-300"
+                                                    ? "border-brand-purple bg-brand-purple/10"
+                                                    : "border-neutral-200 hover:border-neutral-300"
                                                     }`}
                                             >
                                                 <MapPin
                                                     className={`h-4 w-4 shrink-0 ${branch === b.name
-                                                            ? "text-brand-purple"
-                                                            : "text-neutral-400"
+                                                        ? "text-brand-purple"
+                                                        : "text-neutral-400"
                                                         }`}
                                                 />
                                                 <div>
@@ -260,9 +278,10 @@ export function ConsultationBooking() {
 
                         <button
                             type="submit"
-                            className="mt-6 w-full rounded-xl bg-brand-purple px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-brand-purple/20 transition-all duration-300 hover:bg-brand-deep hover:shadow-lg"
+                            disabled={loading}
+                            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-purple px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-brand-purple/20 transition-all duration-300 hover:bg-brand-deep hover:shadow-lg disabled:opacity-60"
                         >
-                            Book Consultation
+                            {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Booking...</> : "Book Consultation"}
                         </button>
 
                         <p className="mt-3 text-center text-xs text-neutral-400">

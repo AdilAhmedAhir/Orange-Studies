@@ -2,8 +2,9 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle, MessageCircle, Globe } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle, MessageCircle, Globe, Loader2 } from "lucide-react";
 import { Footer } from "@/components/home/Footer";
+import { submitLead } from "@/app/actions/lead";
 
 const contactInfo = [
     { icon: MapPin, label: "Head Office", value: "House 12, Road 5, Block C, Bashundhara R/A, Dhaka 1229", color: "text-brand-orange" },
@@ -25,6 +26,7 @@ export default function ContactPage() {
     const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
     const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
     const up = (f: string, v: string) => setForm((p) => ({ ...p, [f]: v }));
 
     return (
@@ -75,7 +77,7 @@ export default function ContactPage() {
                                 <p className="mt-2 text-sm text-neutral-600">We&apos;ll respond within 24 hours. In the meantime, explore our study abroad guides.</p>
                             </motion.div>
                         ) : (
-                            <motion.form initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="space-y-4">
+                            <motion.form initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} onSubmit={async (e) => { e.preventDefault(); setLoading(true); try { await submitLead({ name: form.name, email: form.email, phone: form.phone || undefined, type: "CONTACT", message: form.subject ? `[${form.subject}] ${form.message}` : form.message }); setSubmitted(true); } catch { setSubmitted(true); } finally { setLoading(false); } }} className="space-y-4">
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <input type="text" placeholder="Your Name" required value={form.name} onChange={(e) => up("name", e.target.value)} className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm outline-none transition-colors focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20" />
                                     <input type="email" placeholder="Email" required value={form.email} onChange={(e) => up("email", e.target.value)} className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm outline-none transition-colors focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20" />
@@ -92,8 +94,8 @@ export default function ContactPage() {
                                     </select>
                                 </div>
                                 <textarea placeholder="Your message..." rows={5} required value={form.message} onChange={(e) => up("message", e.target.value)} className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm outline-none transition-colors focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 resize-none" />
-                                <button type="submit" className="inline-flex items-center gap-2 rounded-xl bg-brand-purple px-7 py-3.5 text-sm font-bold text-white shadow-md shadow-brand-purple/20 transition-all hover:bg-brand-deep hover:shadow-lg">
-                                    <Send className="h-4 w-4" /> Send Message
+                                <button type="submit" disabled={loading} className="inline-flex items-center gap-2 rounded-xl bg-brand-purple px-7 py-3.5 text-sm font-bold text-white shadow-md shadow-brand-purple/20 transition-all hover:bg-brand-deep hover:shadow-lg disabled:opacity-60">
+                                    {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</> : <><Send className="h-4 w-4" /> Send Message</>}
                                 </button>
                             </motion.form>
                         )}

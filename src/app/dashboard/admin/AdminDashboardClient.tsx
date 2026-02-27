@@ -2,10 +2,11 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
 import {
     LayoutDashboard, Users, FileText, GraduationCap, Building2,
     Clock, CheckCircle, AlertCircle, ArrowRight, LogOut,
-    TrendingUp, Eye,
+    TrendingUp, Eye, MessageCircle,
 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
 
@@ -34,6 +35,15 @@ interface RecentApp {
     date: string;
 }
 
+interface RecentLead {
+    id: string;
+    name: string;
+    email: string;
+    type: string;
+    status: string;
+    date: string;
+}
+
 function formatStatus(status: string): { label: string; color: string } {
     const map: Record<string, { label: string; color: string }> = {
         SUBMITTED: { label: "Submitted", color: "bg-blue-100 text-blue-700" },
@@ -51,11 +61,13 @@ export default function AdminDashboardClient({
     kpi,
     statusBreakdown,
     recentApplications,
+    recentLeads,
     adminName,
 }: {
     kpi: KPI;
     statusBreakdown: StatusBreakdown[];
     recentApplications: RecentApp[];
+    recentLeads: RecentLead[];
     adminName: string;
 }) {
     return (
@@ -72,9 +84,9 @@ export default function AdminDashboardClient({
                     </div>
                     <div className="flex items-center gap-4">
                         <span className="text-sm text-neutral-500">{adminName}</span>
-                        <Link href="/" className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-700 transition-colors">
+                        <button onClick={() => signOut({ callbackUrl: '/admin/login' })} className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-700 transition-colors">
                             <LogOut className="h-3.5 w-3.5" /> Exit
-                        </Link>
+                        </button>
                     </div>
                 </div>
             </header>
@@ -212,6 +224,65 @@ export default function AdminDashboardClient({
                             </div>
                         )}
                     </div>
+                </div>
+
+                {/* ─── Recent Leads ─── */}
+                <div className="rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
+                            <MessageCircle className="h-5 w-5 text-brand-orange" /> Recent Leads & Consultations
+                        </h3>
+                    </div>
+
+                    {recentLeads.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b border-neutral-100">
+                                        <th className="pb-3 text-left text-[10px] font-bold uppercase text-neutral-400">Name</th>
+                                        <th className="pb-3 text-left text-[10px] font-bold uppercase text-neutral-400">Email</th>
+                                        <th className="pb-3 text-left text-[10px] font-bold uppercase text-neutral-400">Type</th>
+                                        <th className="pb-3 text-left text-[10px] font-bold uppercase text-neutral-400">Status</th>
+                                        <th className="pb-3 text-left text-[10px] font-bold uppercase text-neutral-400">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {recentLeads.map((lead, i) => {
+                                        const typeMap: Record<string, { label: string; color: string }> = {
+                                            CONSULTATION_ONLINE: { label: "Online Consult", color: "bg-purple-100 text-purple-700" },
+                                            CONSULTATION_OFFLINE: { label: "In-Person", color: "bg-blue-100 text-blue-700" },
+                                            CONTACT: { label: "Contact", color: "bg-amber-100 text-amber-700" },
+                                        };
+                                        const typeInfo = typeMap[lead.type] || { label: lead.type, color: "bg-neutral-100 text-neutral-700" };
+                                        return (
+                                            <motion.tr
+                                                key={lead.id}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ delay: i * 0.04 }}
+                                                className="border-b border-neutral-50 last:border-0"
+                                            >
+                                                <td className="py-3 font-semibold text-neutral-800">{lead.name}</td>
+                                                <td className="py-3 text-neutral-500">{lead.email}</td>
+                                                <td className="py-3">
+                                                    <span className={`rounded-full px-3 py-1 text-[10px] font-bold ${typeInfo.color}`}>{typeInfo.label}</span>
+                                                </td>
+                                                <td className="py-3">
+                                                    <span className={`rounded-full px-3 py-1 text-[10px] font-bold ${lead.status === "NEW" ? "bg-emerald-100 text-emerald-700" : "bg-neutral-100 text-neutral-600"}`}>{lead.status}</span>
+                                                </td>
+                                                <td className="py-3 text-xs text-neutral-400 whitespace-nowrap">{lead.date}</td>
+                                            </motion.tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                            <MessageCircle className="h-10 w-10 text-neutral-300" />
+                            <p className="mt-3 text-sm text-neutral-400">No leads captured yet.</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
