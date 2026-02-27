@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import {
     ArrowRight, Eye, EyeOff, Mail, Lock, User, Phone,
@@ -28,14 +29,23 @@ export default function LoginPage() {
     const updateForm = (field: string, value: string) =>
         setForm((prev) => ({ ...prev, [field]: value }));
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError("");
-        // Simulated auth — redirect after short delay
-        setTimeout(() => {
+
+        const res = await signIn("credentials", {
+            redirect: false,
+            email: form.email,
+            password: form.password,
+        });
+
+        if (res?.error) {
+            setError("Invalid email or password.");
+            setIsLoading(false);
+        } else if (res?.ok) {
             router.push("/dashboard/student");
-        }, 1200);
+        }
     };
 
     return (

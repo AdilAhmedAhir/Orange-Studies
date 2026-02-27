@@ -1,0 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Auth ────────────────────────────────────────────
+enum Role {
+  STUDENT
+  RECRUITER
+  INSTITUTION
+  ADMIN
+  MANAGER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  phone        String?
+  role         Role     @default(STUDENT)
+  nationality  String?
+  currentCity  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  applications Application[]
+  documents    Document[]
+}
+
+// ─── Catalog ─────────────────────────────────────────
+model Country {
+  id   String @id @default(cuid())
+  name String @unique
+  code String @unique
+  flag String
+
+  universities University[]
+}
+
+model University {
+  id                    String  @id @default(cuid())
+  slug                  String  @unique
+  name                  String
+  location              String
+  ranking               Int
+  logoPlaceholder       String
+  tuitionMin            Int
+  tuitionMax            Int
+  tuitionCurrency       String  @default("GBP")
+  established           Int
+  totalStudents         Int
+  internationalStudents Int
+  acceptanceRate        Int
+  description           String
+  detailedDescription   String  @db.Text
+  highlights            String[]
+  facilities            String[]
+  campusLife            String  @db.Text
+  admissionRequirements String[]
+  accommodationInfo     String  @db.Text
+  colorAccent           String
+  tags                  String[]
+
+  countryId String
+  country   Country @relation(fields: [countryId], references: [id])
+
+  programs Program[]
+
+  @@index([countryId])
+}
+
+model Program {
+  id                  String   @id @default(cuid())
+  slug                String   @unique
+  title               String
+  level               String   // Bachelor, Master, PhD, Diploma
+  duration            String
+  tuitionFee          Int
+  currency            String   @default("GBP")
+  intakeDates         String[]
+  description         String
+  detailedDescription String   @db.Text
+  modules             String[]
+  entryRequirements   String[]
+  careerOutcomes      String[]
+  scholarshipAvailable Boolean @default(false)
+  applicationDeadline String
+  studyMode           String   // Full-time, Part-time, Both
+
+  universityId String
+  university   University @relation(fields: [universityId], references: [id])
+
+  applications Application[]
+
+  @@index([universityId])
+}
+
+// ─── Application Flow ────────────────────────────────
+enum ApplicationStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  OFFER_RECEIVED
+  OFFER_ACCEPTED
+  VISA_PROCESSING
+  ENROLLED
+  REJECTED
+}
+
+model Application {
+  id         String            @id @default(cuid())
+  refCode    String            @unique @default(cuid())
+  status     ApplicationStatus @default(SUBMITTED)
+  progress   Int               @default(15)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  programId String
+  program   Program @relation(fields: [programId], references: [id])
+
+  timeline TimelineStep[]
+
+  @@index([userId])
+  @@index([programId])
+}
+
+model TimelineStep {
+  id     String  @id @default(cuid())
+  step   String
+  date   String
+  done   Boolean @default(false)
+  active Boolean @default(false)
+  order  Int
+
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+}
+
+// ─── Documents ───────────────────────────────────────
+enum DocumentStatus {
+  MISSING
+  PENDING
+  VERIFIED
+}
+
+model Document {
+  id        String         @id @default(cuid())
+  name      String
+  fileName  String?
+  fileUrl   String?
+  status    DocumentStatus @default(MISSING)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

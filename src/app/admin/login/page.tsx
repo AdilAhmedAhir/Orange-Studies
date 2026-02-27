@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { ArrowRight, Eye, EyeOff, Mail, Lock, Shield, UserCog, AlertTriangle } from "lucide-react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
@@ -21,14 +22,23 @@ export default function AdminLoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError("");
-        // Simulated admin auth — redirect after short delay
-        setTimeout(() => {
+
+        const res = await signIn("credentials", {
+            redirect: false,
+            email,
+            password,
+        });
+
+        if (res?.error) {
+            setError("Invalid credentials.");
+            setIsLoading(false);
+        } else if (res?.ok) {
             router.push("/dashboard/admin");
-        }, 1200);
+        }
     };
 
     return (
