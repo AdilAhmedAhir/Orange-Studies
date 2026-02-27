@@ -25,6 +25,7 @@ interface StatusBreakdown {
 
 interface RecentApp {
     id: string;
+    appId: string;
     studentName: string;
     studentEmail: string;
     program: string;
@@ -168,6 +169,7 @@ export default function AdminDashboardClient({
                                             <th className="pb-3 text-left text-[10px] font-bold uppercase text-neutral-400">University</th>
                                             <th className="pb-3 text-left text-[10px] font-bold uppercase text-neutral-400">Status</th>
                                             <th className="pb-3 text-left text-[10px] font-bold uppercase text-neutral-400">Date</th>
+                                            <th className="pb-3 text-right text-[10px] font-bold uppercase text-neutral-400">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -191,6 +193,12 @@ export default function AdminDashboardClient({
                                                         <span className={`rounded-full px-3 py-1 text-[10px] font-bold ${color}`}>{label}</span>
                                                     </td>
                                                     <td className="py-3 text-xs text-neutral-400 whitespace-nowrap">{app.date}</td>
+                                                    <td className="py-3 text-right">
+                                                        <Link href={`/dashboard/admin/application/${app.appId}`}
+                                                            className="inline-flex items-center gap-1.5 rounded-lg bg-brand-purple/10 px-3 py-1.5 text-[10px] font-bold text-brand-purple transition-all hover:bg-brand-purple hover:text-white">
+                                                            <Eye className="h-3 w-3" /> Manage
+                                                        </Link>
+                                                    </td>
                                                 </motion.tr>
                                             );
                                         })}

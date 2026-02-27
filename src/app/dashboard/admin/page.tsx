@@ -56,6 +56,7 @@ export default async function AdminDashboardPage() {
 
     const serializedRecent = recentApps.map((app) => ({
         id: app.refCode,
+        appId: app.id,
         studentName: app.user.fullName,
         studentEmail: app.user.email,
         program: app.program.title,
