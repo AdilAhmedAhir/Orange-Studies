@@ -381,8 +381,15 @@ export function Navbar() {
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.4 }}
-                                className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10"
+                                className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10 space-y-3"
                             >
+                                <Link
+                                    href="/login"
+                                    onClick={() => setIsMobileOpen(false)}
+                                    className="block rounded-xl border border-white/20 px-6 py-3 text-center text-sm font-semibold text-white/80 transition-all hover:border-white/40 hover:text-white"
+                                >
+                                    Sign In
+                                </Link>
                                 <Link
                                     href="/contact"
                                     onClick={() => setIsMobileOpen(false)}
