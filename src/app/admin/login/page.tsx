@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -13,7 +14,7 @@ const roles = [
     { id: "manager", title: "Manager", icon: UserCog },
 ];
 
-export default function AdminLoginPage() {
+function AdminLoginClient() {
     const router = useRouter();
     const [selectedRole, setSelectedRole] = useState("admin");
     const [showPassword, setShowPassword] = useState(false);
@@ -85,7 +86,7 @@ export default function AdminLoginPage() {
                 </motion.div>
 
                 {/* Form */}
-                <motion.form onSubmit={handleSubmit} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                <motion.form onSubmit={handleSubmit} suppressHydrationWarning initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                     className="rounded-2xl border border-white/10 bg-white/5 p-7 backdrop-blur-sm space-y-4">
                     <div>
                         <label className="mb-1.5 block text-xs font-semibold text-white/50">Email</label>
@@ -135,5 +136,17 @@ export default function AdminLoginPage() {
                 </motion.div>
             </div>
         </div>
+    );
+}
+
+export default function AdminLoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center" style={{ background: "linear-gradient(135deg, #1a0a2e 0%, #4D2075 50%, #2d1250 100%)" }}>
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-orange border-t-transparent" />
+            </div>
+        }>
+            <AdminLoginClient />
+        </Suspense>
     );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 
 export default function GlobalError({
@@ -9,6 +10,10 @@ export default function GlobalError({
     error: Error & { digest?: string };
     reset: () => void;
 }) {
+    useEffect(() => {
+        console.error("Caught by Global Error Boundary:", error);
+    }, [error]);
+
     return (
         <html lang="en">
             <body style={{ margin: 0, fontFamily: "system-ui, sans-serif" }}>
@@ -83,6 +88,18 @@ export default function GlobalError({
                             <RotateCcw style={{ width: "1rem", height: "1rem" }} />
                             Try Again
                         </button>
+
+                        <p style={{
+                            marginTop: "1.5rem",
+                            fontSize: "0.75rem",
+                            color: "#9ca3af",
+                            fontFamily: "monospace",
+                            maxWidth: "32rem",
+                            textAlign: "center",
+                            wordBreak: "break-word",
+                        }}>
+                            {error.message || "Unknown client error"}
+                        </p>
                     </div>
                 </div>
             </body>

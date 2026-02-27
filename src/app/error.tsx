@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 
 export default function Error({
@@ -9,6 +10,10 @@ export default function Error({
     error: Error & { digest?: string };
     reset: () => void;
 }) {
+    useEffect(() => {
+        console.error("Caught by Error Boundary:", error);
+    }, [error]);
+
     return (
         <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-6">
             <div className="max-w-md text-center">
@@ -40,6 +45,10 @@ export default function Error({
                     <RotateCcw className="h-4 w-4" />
                     Try Again
                 </button>
+
+                <p className="mt-6 text-xs text-gray-400 font-mono max-w-lg text-center break-words">
+                    {error.message || "Unknown client error"}
+                </p>
             </div>
         </div>
     );
