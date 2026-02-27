@@ -1,6 +1,8 @@
 import { getAllProgramsForBrowse, getDistinctDisciplines } from "@/lib/data";
 import ProgramsClient from "./ProgramsClient";
 
+export const dynamic = "force-dynamic";
+
 interface Props {
     searchParams: Promise<{ discipline?: string }>;
 }
