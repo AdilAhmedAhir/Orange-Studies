@@ -84,7 +84,7 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
     return (
         <AdminCMSLayout title="User Directory">
             {/* ─── KPI Stats ─── */}
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {[
                     { label: "Total Users", value: users.length, color: "text-brand-purple", bg: "bg-brand-purple/10", ring: "ring-brand-purple/5" },
                     { label: "Staff (Admin/Manager)", value: staffCount, color: "text-red-600", bg: "bg-red-50", ring: "ring-red-100" },
@@ -126,8 +126,8 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
 
             {/* ─── Data Table ─── */}
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
+                <div className="overflow-x-auto w-full">
+                    <table className="w-full min-w-[700px] text-left text-sm">
                         <thead>
                             <tr>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">User</th>
@@ -211,7 +211,7 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                     <>
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px]" onClick={() => { setModal(false); setGeneratedPassword(null); }} />
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl">
+                            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-bold text-neutral-900 font-[family-name:var(--font-heading)]">Add Staff Account</h3>
                                 <button onClick={() => { setModal(false); setGeneratedPassword(null); }}><X className="h-5 w-5 text-neutral-400 hover:text-neutral-700" /></button>

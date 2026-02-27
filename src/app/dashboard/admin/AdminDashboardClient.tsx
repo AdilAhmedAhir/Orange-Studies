@@ -141,7 +141,7 @@ export default function AdminDashboardClient({
             {activeTab === "overview" && (<>
 
                 {/* ─── KPI Cards ─── */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
                     {[
                         { label: "Total Students", value: kpi.totalStudents, icon: Users, color: "text-brand-purple", bg: "bg-brand-purple/10", ring: "ring-brand-purple/5" },
                         { label: "Applications", value: kpi.totalApplications, icon: FileText, color: "text-brand-orange", bg: "bg-brand-orange/10", ring: "ring-brand-orange/5" },
@@ -168,7 +168,7 @@ export default function AdminDashboardClient({
                 </div>
 
                 {/* ─── Status Breakdown + Recent Apps ─── */}
-                <div className="grid gap-6 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* Status Breakdown */}
                     <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
@@ -212,8 +212,8 @@ export default function AdminDashboardClient({
                         </div>
 
                         {recentApplications.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
+                            <div className="overflow-x-auto w-full">
+                                <table className="w-full min-w-[700px] text-sm">
                                     <thead>
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Student</th>
@@ -273,8 +273,8 @@ export default function AdminDashboardClient({
                     </div>
 
                     {recentLeads.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm">
+                        <div className="overflow-x-auto w-full">
+                            <table className="w-full min-w-[700px] text-sm">
                                 <thead>
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Name</th>

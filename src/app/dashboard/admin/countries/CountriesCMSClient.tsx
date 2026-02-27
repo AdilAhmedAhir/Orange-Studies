@@ -64,8 +64,8 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
             </div>
 
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
+                <div className="overflow-x-auto w-full">
+                    <table className="w-full min-w-[600px] text-left text-sm">
                         <thead>
                             <tr>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Country</th>
@@ -115,7 +115,7 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
                     <>
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px]" onClick={() => setModal(false)} />
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
+                            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-bold text-neutral-900 font-[family-name:var(--font-heading)]">{editId ? "Edit Country" : "Add Country"}</h3>
                                 <button onClick={() => setModal(false)}><X className="h-5 w-5 text-neutral-400 hover:text-neutral-700" /></button>
@@ -126,7 +126,7 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
                                     <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="United Kingdom"
                                         className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-xs font-bold text-neutral-500 uppercase">Code * <span className="normal-case text-neutral-400">(ISO 2-letter)</span></label>
                                         <input required maxLength={3} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="GB"

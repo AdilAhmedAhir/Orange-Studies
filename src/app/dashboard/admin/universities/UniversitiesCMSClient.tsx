@@ -72,8 +72,8 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
 
             {/* Data Table */}
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
+                <div className="overflow-x-auto w-full">
+                    <table className="w-full min-w-[700px] text-left text-sm">
                         <thead>
                             <tr>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">University</th>
@@ -129,7 +129,7 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
                     <>
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px]" onClick={() => setModal(false)} />
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-lg -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
+                            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-lg -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-bold text-neutral-900 font-[family-name:var(--font-heading)]">{editId ? "Edit University" : "Add University"}</h3>
                                 <button onClick={() => setModal(false)}><X className="h-5 w-5 text-neutral-400 hover:text-neutral-700" /></button>
@@ -140,7 +140,7 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
                                     <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
                                         className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-xs font-bold text-neutral-500 uppercase">Location *</label>
                                         <input required value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
@@ -155,7 +155,7 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
                                         </select>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                     <div>
                                         <label className="text-xs font-bold text-neutral-500 uppercase">Ranking</label>
                                         <input type="number" value={form.ranking} onChange={(e) => setForm({ ...form, ranking: e.target.value })} placeholder="999"
@@ -172,7 +172,7 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
                                             className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="text-xs font-bold text-neutral-500 uppercase">Tuition Min</label>
                                         <input type="number" value={form.tuitionMin} onChange={(e) => setForm({ ...form, tuitionMin: e.target.value })} placeholder="0"

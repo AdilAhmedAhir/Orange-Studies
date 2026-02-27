@@ -206,7 +206,7 @@ export default function AdminApplicationClient({ application }: { application: A
             </motion.div>
 
             {/* ─── MAIN CONTENT GRID ─── */}
-            <div className="grid gap-6 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 {/* ─── LEFT COLUMN ─── */}
                 <div className="space-y-6 lg:col-span-2">
                     {/* Student Profile */}
@@ -224,7 +224,7 @@ export default function AdminApplicationClient({ application }: { application: A
                                 <p className="text-sm text-neutral-500">Member since {application.student.memberSince}</p>
                             </div>
                         </div>
-                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <div className="mt-4 grid gap-3 grid-cols-1 sm:grid-cols-2">
                             {[
                                 { icon: Mail, label: "Email", value: application.student.email },
                                 { icon: Phone, label: "Phone", value: application.student.phone },
@@ -471,7 +471,7 @@ export default function AdminApplicationClient({ application }: { application: A
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl"
+                            className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto"
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-bold text-gray-900 font-[family-name:var(--font-heading)]">Request Re-upload</h3>
