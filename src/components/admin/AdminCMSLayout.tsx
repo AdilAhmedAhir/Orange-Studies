@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
 import {
-    LayoutDashboard, Building2, GraduationCap, Globe, LogOut, ArrowLeft,
+    LayoutDashboard, Building2, GraduationCap, Globe, LogOut, ArrowLeft, Users,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
     { href: "/dashboard/admin/universities", label: "Universities", icon: Building2 },
     { href: "/dashboard/admin/programs", label: "Programs", icon: GraduationCap },
     { href: "/dashboard/admin/countries", label: "Countries", icon: Globe },
+    { href: "/dashboard/admin/users", label: "Users", icon: Users },
 ];
 
 export default function AdminCMSLayout({ children, title }: { children: React.ReactNode; title: string }) {
