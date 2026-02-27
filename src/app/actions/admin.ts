@@ -69,3 +69,137 @@ export async function updateApplicationStatus(
 
     return { success: true };
 }
+
+/* ── Helper: auth gate ── */
+async function requireAdmin() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) return null;
+    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (!user || (user.role !== "ADMIN" && user.role !== "MANAGER")) return null;
+    return user;
+}
+
+/* ── Helper: slug generator ── */
+function slugify(text: string) {
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+}
+
+/* ─────────────────────────────────────────────────────
+   CREATE UNIVERSITY
+   ───────────────────────────────────────────────────── */
+interface CreateUniversityPayload {
+    name: string;
+    location: string;
+    countryId: string;
+    ranking: number;
+    description: string;
+}
+
+export async function createUniversity(
+    data: CreateUniversityPayload
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        const admin = await requireAdmin();
+        if (!admin) return { success: false, error: "Unauthorized." };
+
+        if (!data.name || !data.countryId) {
+            return { success: false, error: "Name and country are required." };
+        }
+
+        await prisma.university.create({
+            data: {
+                slug: slugify(data.name),
+                name: data.name.trim(),
+                location: data.location.trim(),
+                ranking: data.ranking || 999,
+                logoPlaceholder: "🏛️",
+                tuitionMin: 0,
+                tuitionMax: 0,
+                tuitionCurrency: "USD",
+                established: new Date().getFullYear(),
+                totalStudents: 0,
+                internationalStudents: 0,
+                acceptanceRate: 0,
+                description: data.description || "",
+                detailedDescription: data.description || "",
+                highlights: [],
+                facilities: [],
+                campusLife: "",
+                admissionRequirements: [],
+                accommodationInfo: "",
+                colorAccent: "#662D91",
+                tags: [],
+                countryId: data.countryId,
+            },
+        });
+
+        revalidatePath("/programs");
+        revalidatePath("/institutions");
+        revalidatePath("/dashboard/admin");
+        return { success: true };
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Failed to create university.";
+        return { success: false, error: msg };
+    }
+}
+
+/* ─────────────────────────────────────────────────────
+   CREATE PROGRAM
+   ───────────────────────────────────────────────────── */
+interface CreateProgramPayload {
+    title: string;
+    universityId: string;
+    level: string;
+    duration: string;
+    tuitionFee: number;
+    currency: string;
+    description: string;
+    discipline: string;
+    studyMode: string;
+}
+
+export async function createProgram(
+    data: CreateProgramPayload
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        const admin = await requireAdmin();
+        if (!admin) return { success: false, error: "Unauthorized." };
+
+        if (!data.title || !data.universityId) {
+            return { success: false, error: "Title and university are required." };
+        }
+
+        await prisma.program.create({
+            data: {
+                slug: slugify(data.title),
+                title: data.title.trim(),
+                level: data.level || "Bachelor",
+                duration: data.duration || "4 years",
+                tuitionFee: data.tuitionFee || 0,
+                currency: data.currency || "USD",
+                intakeDates: ["September"],
+                description: data.description || "",
+                detailedDescription: data.description || "",
+                modules: [],
+                entryRequirements: [],
+                careerOutcomes: [],
+                scholarshipAvailable: false,
+                applicationDeadline: "Rolling",
+                studyMode: data.studyMode || "Full-time",
+                discipline: data.discipline || "",
+                universityId: data.universityId,
+            },
+        });
+
+        revalidatePath("/programs");
+        revalidatePath("/search");
+        revalidatePath("/dashboard/admin");
+        return { success: true };
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Failed to create program.";
+        return { success: false, error: msg };
+    }
+}

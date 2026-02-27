@@ -80,3 +80,34 @@ export async function searchPrograms(filters: {
         orderBy: { title: "asc" },
     });
 }
+
+// ─── Programs Browse (with optional discipline filter) ──
+
+export async function getAllProgramsForBrowse(discipline?: string) {
+    const where: Record<string, unknown> = {};
+    if (discipline) {
+        where.discipline = { contains: discipline, mode: "insensitive" };
+    }
+
+    return prisma.program.findMany({
+        where,
+        include: {
+            university: {
+                include: { country: true },
+            },
+        },
+        orderBy: { title: "asc" },
+    });
+}
+
+// ─── Distinct disciplines from DB ──────────────────────
+
+export async function getDistinctDisciplines(): Promise<string[]> {
+    const results = await prisma.program.findMany({
+        select: { discipline: true },
+        distinct: ["discipline"],
+        where: { discipline: { not: "" } },
+        orderBy: { discipline: "asc" },
+    });
+    return results.map((r) => r.discipline);
+}

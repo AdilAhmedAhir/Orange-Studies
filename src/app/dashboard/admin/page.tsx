@@ -80,6 +80,12 @@ export default async function AdminDashboardPage() {
         date: lead.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     }));
 
+    // Universities & countries for CRUD forms
+    const [universities, countries] = await Promise.all([
+        prisma.university.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+        prisma.country.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, flag: true } }),
+    ]);
+
     return (
         <AdminDashboardClient
             kpi={{
@@ -93,6 +99,8 @@ export default async function AdminDashboardPage() {
             recentApplications={serializedRecent}
             recentLeads={serializedLeads}
             adminName={user.fullName}
+            universities={universities}
+            countries={countries}
         />
     );
 }

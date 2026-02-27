@@ -94,6 +94,7 @@ model Program {
   scholarshipAvailable Boolean @default(false)
   applicationDeadline String
   studyMode           String   // Full-time, Part-time, Both
+  discipline          String   @default("") // e.g. Engineering & Technology, Business & Management
 
   universityId String
   university   University @relation(fields: [universityId], references: [id])
