@@ -7,7 +7,7 @@ import { signOut } from "next-auth/react";
 import {
     LayoutDashboard, Users, FileText, GraduationCap, Building2,
     Clock, CheckCircle, AlertCircle, ArrowRight, LogOut,
-    TrendingUp, Eye, MessageCircle, Plus, Loader2,
+    TrendingUp, Eye, MessageCircle, Plus, Loader2, Globe,
 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
 import { createUniversity, createProgram } from "@/app/actions/admin";
@@ -155,6 +155,27 @@ export default function AdminDashboardClient({
                             {kpi.totalApplications} total applications across {kpi.totalPrograms} programs in {kpi.totalUniversities} universities.
                         </p>
                     </div>
+                </div>
+
+                {/* ─── CMS Quick Access ─── */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {[
+                        { href: "/dashboard/admin/universities", label: "Universities", icon: Building2, color: "text-brand-purple", bg: "bg-brand-purple/10" },
+                        { href: "/dashboard/admin/programs", label: "Programs", icon: GraduationCap, color: "text-brand-orange", bg: "bg-brand-orange/10" },
+                        { href: "/dashboard/admin/countries", label: "Countries", icon: Globe, color: "text-emerald-600", bg: "bg-emerald-100" },
+                        { href: "/dashboard/admin/users", label: "Users", icon: Users, color: "text-red-600", bg: "bg-red-50" },
+                    ].map((item) => (
+                        <Link key={item.href} href={item.href}
+                            className="group flex items-center gap-3 rounded-2xl border border-neutral-200/60 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                            <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${item.bg} transition-transform group-hover:scale-110`}>
+                                <item.icon className={`h-5 w-5 ${item.color}`} />
+                            </div>
+                            <div>
+                                <p className="text-sm font-bold text-neutral-800">{item.label}</p>
+                                <p className="text-[10px] text-neutral-400">Manage →</p>
+                            </div>
+                        </Link>
+                    ))}
                 </div>
 
                 {/* ─── Tab Bar ─── */}
