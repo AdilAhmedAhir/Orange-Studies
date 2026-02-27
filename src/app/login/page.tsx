@@ -238,6 +238,14 @@ function LoginForm() {
                                 </div>
                             )}
 
+                            {/* Error Alert */}
+                            {error && (
+                                <div className="bg-red-50 text-red-600 border border-red-200 p-3 rounded-md mb-4 flex items-center gap-2 text-xs font-semibold">
+                                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                                    {error}
+                                </div>
+                            )}
+
                             {/* Submit */}
                             <motion.button
                                 type="submit"
@@ -257,14 +265,7 @@ function LoginForm() {
                     </AnimatePresence>
                 </motion.form>
 
-                {/* Error Banner */}
-                {error && (
-                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                        className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-xs font-semibold text-red-600">
-                        <AlertTriangle className="h-4 w-4 shrink-0" />
-                        {error}
-                    </motion.div>
-                )}
+
 
                 {/* Demo Notice */}
                 <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
