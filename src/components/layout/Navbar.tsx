@@ -22,6 +22,7 @@ const navLinks: NavLink[] = [
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Programs", href: "/programs" },
+    { name: "Institutions", href: "/institutions" },
     {
         name: "Study Abroad",
         href: "/study-abroad",
@@ -42,9 +43,9 @@ const navLinks: NavLink[] = [
 const pillLinks: { name: string; href: string }[] = [
     { name: "Home", href: "/" },
     { name: "Programs", href: "/programs" },
-    { name: "Study Abroad", href: "/study-abroad" },
+    { name: "Institutions", href: "/institutions" },
+    { name: "Search", href: "/search" },
     { name: "Blog", href: "/blog" },
-    { name: "Contact", href: "/contact" },
 ];
 
 export function Navbar() {
@@ -130,8 +131,14 @@ export function Navbar() {
                         ))}
                     </div>
 
-                    {/* CTA Button + Mobile Toggle */}
-                    <div className="flex items-center gap-4">
+                    {/* CTA Buttons + Mobile Toggle */}
+                    <div className="flex items-center gap-3">
+                        <Link
+                            href="/login"
+                            className="hidden rounded-full border border-white/20 px-5 py-2 text-sm font-medium text-white/80 transition-all hover:border-white/40 hover:text-white lg:block"
+                        >
+                            Sign In
+                        </Link>
                         <Link
                             href="/contact"
                             className="hidden rounded-full bg-brand-orange px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-orange/25 transition-all hover:bg-brand-orange-dark hover:shadow-xl hover:shadow-brand-orange/30 hover:scale-105 lg:block"

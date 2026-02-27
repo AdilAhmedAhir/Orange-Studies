@@ -30,10 +30,10 @@ const footerLinks = {
 };
 
 const socials = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Instagram, href: "#", label: "Instagram" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Youtube, href: "#", label: "YouTube" },
+    { icon: Facebook, href: "https://facebook.com/orangestudies", label: "Facebook" },
+    { icon: Instagram, href: "https://instagram.com/orangestudies", label: "Instagram" },
+    { icon: Linkedin, href: "https://linkedin.com/company/orangestudies", label: "LinkedIn" },
+    { icon: Youtube, href: "https://youtube.com/@orangestudies", label: "YouTube" },
 ];
 
 export function Footer() {
