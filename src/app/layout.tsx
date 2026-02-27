@@ -3,6 +3,7 @@ import { Outfit, Montserrat } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { WhatsAppFAB } from "@/components/layout/WhatsAppFAB";
+import { Analytics } from "@vercel/analytics/next";
 
 const outfit = Outfit({
   variable: "--font-heading",
@@ -51,6 +52,7 @@ export default function RootLayout({
         <Navbar />
         <main>{children}</main>
         <WhatsAppFAB />
+        <Analytics />
       </body>
     </html>
   );
