@@ -10,6 +10,7 @@ import {
     GraduationCap, AlertTriangle,
 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
+import { registerUser } from "@/app/actions/auth";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -34,17 +35,48 @@ export default function LoginPage() {
         setIsLoading(true);
         setError("");
 
-        const res = await signIn("credentials", {
-            redirect: false,
-            email: form.email,
-            password: form.password,
-        });
+        if (isLogin) {
+            // ─── Sign In ───
+            const res = await signIn("credentials", {
+                redirect: false,
+                email: form.email,
+                password: form.password,
+            });
 
-        if (res?.error) {
-            setError("Invalid email or password.");
-            setIsLoading(false);
-        } else if (res?.ok) {
-            router.push("/dashboard/student");
+            if (res?.error) {
+                setError("Invalid email or password.");
+                setIsLoading(false);
+            } else if (res?.ok) {
+                router.push("/dashboard/student");
+            }
+        } else {
+            // ─── Create Account ───
+            const regRes = await registerUser({
+                fullName: form.fullName,
+                email: form.email,
+                password: form.password,
+                phone: form.phone || undefined,
+            });
+
+            if (regRes.error) {
+                setError(regRes.error);
+                setIsLoading(false);
+                return;
+            }
+
+            // Auto-login after successful registration
+            const signInRes = await signIn("credentials", {
+                redirect: false,
+                email: form.email,
+                password: form.password,
+            });
+
+            if (signInRes?.error) {
+                setError("Account created but auto-login failed. Please sign in.");
+                setIsLoading(false);
+            } else if (signInRes?.ok) {
+                router.push("/dashboard/student");
+            }
         }
     };
 
