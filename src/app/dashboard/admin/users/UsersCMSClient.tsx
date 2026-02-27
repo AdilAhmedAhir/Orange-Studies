@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, Plus, Trash2, Loader2, X, Search, Copy, Check, Shield, ShieldCheck, GraduationCap, Building2, ChevronDown } from "lucide-react";
 import AdminCMSLayout from "@/components/admin/AdminCMSLayout";
+import StatusBadge from "@/components/ui/StatusBadge";
 import { createStaffAccount, changeUserRole, deleteUser } from "@/app/actions/users";
 
 interface UserRow {
@@ -85,17 +86,17 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
             {/* ─── KPI Stats ─── */}
             <div className="grid gap-4 sm:grid-cols-3">
                 {[
-                    { label: "Total Users", value: users.length, color: "text-brand-purple", bg: "bg-brand-purple/10" },
-                    { label: "Staff (Admin/Manager)", value: staffCount, color: "text-red-600", bg: "bg-red-50" },
-                    { label: "Students", value: studentCount, color: "text-blue-600", bg: "bg-blue-50" },
+                    { label: "Total Users", value: users.length, color: "text-brand-purple", bg: "bg-brand-purple/10", ring: "ring-brand-purple/5" },
+                    { label: "Staff (Admin/Manager)", value: staffCount, color: "text-red-600", bg: "bg-red-50", ring: "ring-red-100" },
+                    { label: "Students", value: studentCount, color: "text-blue-600", bg: "bg-blue-50", ring: "ring-blue-100" },
                 ].map((s) => (
-                    <div key={s.label} className="flex items-center gap-4 rounded-2xl border border-neutral-200/60 bg-white p-5 shadow-sm">
-                        <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${s.bg}`}>
+                    <div key={s.label} className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+                        <div className={`flex h-12 w-12 items-center justify-center rounded-full ${s.bg} ring-4 ${s.ring}`}>
                             <Users className={`h-5 w-5 ${s.color}`} />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-neutral-900">{s.value}</p>
-                            <p className="text-xs text-neutral-400">{s.label}</p>
+                            <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+                            <p className="text-xs font-medium text-gray-500">{s.label}</p>
                         </div>
                     </div>
                 ))}
@@ -124,24 +125,24 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
             </div>
 
             {/* ─── Data Table ─── */}
-            <div className="overflow-hidden rounded-2xl border border-neutral-200/60 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                        <thead className="border-b border-neutral-100 bg-neutral-50">
+                        <thead>
                             <tr>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">User</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Role</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Applications</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Joined</th>
-                                {isAdmin && <th className="px-6 py-3 font-semibold text-neutral-500 text-right">Actions</th>}
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">User</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Role</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Applications</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Joined</th>
+                                {isAdmin && <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50 text-right">Actions</th>}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-neutral-100">
+                        <tbody className="divide-y divide-gray-100">
                             {filtered.map((u) => {
                                 const rc = ROLE_COLORS[u.role] || ROLE_COLORS.STUDENT;
                                 const isSelf = u.id === currentUserId;
                                 return (
-                                    <motion.tr key={u.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-neutral-50 transition-colors">
+                                    <motion.tr key={u.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-purple to-brand-orange text-xs font-bold text-white">
@@ -174,9 +175,7 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                                                         )}
                                                     </>
                                                 ) : (
-                                                    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${rc.bg} ${rc.text}`}>
-                                                        {rc.icon} {u.role}
-                                                    </span>
+                                                    <StatusBadge status={u.role} />
                                                 )}
                                             </div>
                                         </td>
@@ -201,7 +200,7 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                         </tbody>
                     </table>
                 </div>
-                <div className="border-t border-neutral-100 bg-neutral-50 px-6 py-3 text-xs text-neutral-400">
+                <div className="border-t border-gray-100 bg-gray-50 px-6 py-3 text-xs font-medium text-gray-400">
                     Showing {filtered.length} of {users.length} users
                 </div>
             </div>

@@ -63,21 +63,21 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
                 </button>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-neutral-200/60 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                        <thead className="border-b border-neutral-100 bg-neutral-50">
+                        <thead>
                             <tr>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Country</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Code</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Universities</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Description</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500 text-right">Actions</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Country</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Code</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Universities</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Description</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-neutral-100">
+                        <tbody className="divide-y divide-gray-100">
                             {filtered.map((c) => (
-                                <motion.tr key={c.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-neutral-50 transition-colors">
+                                <motion.tr key={c.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <span className="text-2xl">{c.flag}</span>
@@ -106,7 +106,7 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
                         </tbody>
                     </table>
                 </div>
-                <div className="border-t border-neutral-100 bg-neutral-50 px-6 py-3 text-xs text-neutral-400">{countries.length} total countries</div>
+                <div className="border-t border-gray-100 bg-gray-50 px-6 py-3 text-xs font-medium text-gray-400">{countries.length} total countries</div>
             </div>
 
             {/* ─── Modal ─── */}

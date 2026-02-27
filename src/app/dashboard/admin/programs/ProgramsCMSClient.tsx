@@ -74,23 +74,23 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
                 </button>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-neutral-200/60 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                        <thead className="border-b border-neutral-100 bg-neutral-50">
+                        <thead>
                             <tr>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Program</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">University</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Level</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Discipline</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Tuition</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500">Apps</th>
-                                <th className="px-6 py-3 font-semibold text-neutral-500 text-right">Actions</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Program</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">University</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Level</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Discipline</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Tuition</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Apps</th>
+                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-neutral-100">
+                        <tbody className="divide-y divide-gray-100">
                             {filtered.map((p) => (
-                                <motion.tr key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-neutral-50 transition-colors">
+                                <motion.tr key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-orange/10">
@@ -123,7 +123,7 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
                         </tbody>
                     </table>
                 </div>
-                <div className="border-t border-neutral-100 bg-neutral-50 px-6 py-3 text-xs text-neutral-400">{programs.length} total programs</div>
+                <div className="border-t border-gray-100 bg-gray-50 px-6 py-3 text-xs font-medium text-gray-400">{programs.length} total programs</div>
             </div>
 
             {/* ─── Modal ─── */}

@@ -9,7 +9,8 @@ import {
     Globe, Loader2, ChevronDown, Shield, Download, Trash2,
     RotateCcw, History, X,
 } from "lucide-react";
-import { LogoIcon } from "@/components/ui/LogoIcon";
+import AdminCMSLayout from "@/components/admin/AdminCMSLayout";
+import StatusBadge from "@/components/ui/StatusBadge";
 import { updateApplicationStatus, requestDocReupload, deleteDocument } from "@/app/actions/admin";
 
 /* ── Types ── */
@@ -144,343 +145,317 @@ export default function AdminApplicationClient({ application }: { application: A
     const statusStyle = getStatusStyle(currentStatus);
 
     return (
-        <div className="min-h-screen bg-neutral-50">
-            {/* ─── TOP HEADER ─── */}
-            <header className="sticky top-0 z-50 border-b border-neutral-200/60 bg-white/90 backdrop-blur-md">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <AdminCMSLayout>
+            {/* ─── Breadcrumb ─── */}
+            <div className="flex items-center gap-2 text-xs text-gray-400">
+                <Link href="/dashboard/admin" className="hover:text-gray-700 transition-colors">Dashboard</Link>
+                <span>/</span>
+                <span className="text-gray-700 font-semibold">Application {application.refCode}</span>
+            </div>
+
+            {/* ─── STATUS CONTROL BAR ─── */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold text-neutral-900 font-[family-name:var(--font-heading)]">
+                            Application Review
+                        </h1>
+                        <p className="mt-1 text-sm text-neutral-500">
+                            Ref: <span className="font-mono font-semibold text-brand-purple">{application.refCode}</span>
+                            <span className="mx-2 text-neutral-300">•</span>
+                            Submitted {application.createdAt}
+                            <span className="mx-2 text-neutral-300">•</span>
+                            Updated {application.updatedAt}
+                        </p>
+                    </div>
+
                     <div className="flex items-center gap-3">
-                        <LogoIcon size={32} />
-                        <span className="text-lg font-black text-brand-purple font-[family-name:var(--font-heading)]">
-                            Orange<span className="text-brand-orange">Studies</span>
-                        </span>
-                        <span className="ml-2 rounded-full bg-brand-purple/10 px-3 py-1 text-[10px] font-bold text-brand-purple uppercase">Admin</span>
-                    </div>
-                    <Link href="/dashboard/admin" className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-800 transition-colors">
-                        <ArrowLeft className="h-4 w-4" /> Back to Dashboard
-                    </Link>
-                </div>
-            </header>
-
-            <div className="mx-auto max-w-7xl px-6 py-8 space-y-8">
-                {/* ─── Breadcrumb ─── */}
-                <div className="flex items-center gap-2 text-xs text-neutral-400">
-                    <Link href="/dashboard/admin" className="hover:text-neutral-700 transition-colors">Dashboard</Link>
-                    <span>/</span>
-                    <span className="text-neutral-700 font-semibold">Application {application.refCode}</span>
-                </div>
-
-                {/* ─── STATUS CONTROL BAR ─── */}
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                    className="rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <h1 className="text-2xl font-bold text-neutral-900 font-[family-name:var(--font-heading)]">
-                                Application Review
-                            </h1>
-                            <p className="mt-1 text-sm text-neutral-500">
-                                Ref: <span className="font-mono font-semibold text-brand-purple">{application.refCode}</span>
-                                <span className="mx-2 text-neutral-300">•</span>
-                                Submitted {application.createdAt}
-                                <span className="mx-2 text-neutral-300">•</span>
-                                Updated {application.updatedAt}
-                            </p>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                            <div className="relative">
-                                <select
-                                    value={currentStatus}
-                                    onChange={(e) => handleStatusChange(e.target.value)}
-                                    disabled={updating}
-                                    className={`appearance-none rounded-xl border-2 px-5 py-2.5 pr-10 text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-brand-purple/20 disabled:opacity-60 ${statusStyle.color}`}
-                                >
-                                    {STATUS_OPTIONS.map((opt) => (
-                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 pointer-events-none opacity-40" />
-                            </div>
-                            {updating && <Loader2 className="h-5 w-5 animate-spin text-brand-purple" />}
-                        </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-neutral-100">
-                        <motion.div
-                            className="h-full rounded-full bg-gradient-to-r from-brand-orange to-brand-purple"
-                            animate={{ width: `${application.progress}%` }}
-                            transition={{ duration: 0.8 }}
-                        />
-                    </div>
-
-                    {statusMessage && (
-                        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                            className={`mt-3 text-xs font-semibold ${statusMessage.includes("success") ? "text-emerald-600" : "text-red-500"}`}>
-                            {statusMessage}
-                        </motion.p>
-                    )}
-                </motion.div>
-
-                {/* ─── MAIN CONTENT GRID ─── */}
-                <div className="grid gap-6 lg:grid-cols-3">
-                    {/* ─── LEFT COLUMN ─── */}
-                    <div className="space-y-6 lg:col-span-2">
-                        {/* Student Profile */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                            className="rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm">
-                            <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
-                                <User className="h-5 w-5 text-brand-purple" /> Student Profile
-                            </h3>
-                            <div className="mt-4 flex items-start gap-4">
-                                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-purple to-brand-orange text-lg font-bold text-white">
-                                    {application.student.fullName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                                </div>
-                                <div>
-                                    <p className="text-lg font-bold text-neutral-900">{application.student.fullName}</p>
-                                    <p className="text-sm text-neutral-500">Member since {application.student.memberSince}</p>
-                                </div>
-                            </div>
-                            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                                {[
-                                    { icon: Mail, label: "Email", value: application.student.email },
-                                    { icon: Phone, label: "Phone", value: application.student.phone },
-                                    { icon: Globe, label: "Nationality", value: application.student.nationality },
-                                    { icon: MapPin, label: "Current City", value: application.student.currentCity },
-                                ].map((item) => (
-                                    <div key={item.label} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-4 py-3">
-                                        <item.icon className="h-4 w-4 shrink-0 text-neutral-400" />
-                                        <div>
-                                            <p className="text-[10px] font-bold text-neutral-400 uppercase">{item.label}</p>
-                                            <p className="text-sm font-medium text-neutral-800">{item.value}</p>
-                                        </div>
-                                    </div>
+                        <div className="relative">
+                            <select
+                                value={currentStatus}
+                                onChange={(e) => handleStatusChange(e.target.value)}
+                                disabled={updating}
+                                className={`appearance-none rounded-xl border-2 px-5 py-2.5 pr-10 text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-brand-purple/20 disabled:opacity-60 ${statusStyle.color}`}
+                            >
+                                {STATUS_OPTIONS.map((opt) => (
+                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
                                 ))}
-                            </div>
-                        </motion.div>
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 pointer-events-none opacity-40" />
+                        </div>
+                        {updating && <Loader2 className="h-5 w-5 animate-spin text-brand-purple" />}
+                    </div>
+                </div>
 
-                        {/* Program Details */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                            className="rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm">
-                            <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
-                                <GraduationCap className="h-5 w-5 text-brand-orange" /> Program Details
-                            </h3>
-                            <div className="mt-4 rounded-xl bg-gradient-to-r from-brand-purple/5 to-brand-orange/5 p-5">
-                                <p className="text-lg font-bold text-neutral-900 font-[family-name:var(--font-heading)]">{application.program.title}</p>
-                                <div className="mt-1 flex items-center gap-2 text-sm text-neutral-600">
-                                    <Building2 className="h-4 w-4 text-neutral-400" />
-                                    <span>{application.university.name}</span>
-                                    <span className="text-neutral-300">•</span>
-                                    <span>{application.university.location}</span>
-                                </div>
-                                <div className="mt-3 flex flex-wrap gap-3 text-xs">
-                                    <span className="rounded-full bg-white px-3 py-1 font-semibold text-neutral-700 shadow-sm">{application.program.level}</span>
-                                    <span className="rounded-full bg-white px-3 py-1 font-semibold text-neutral-700 shadow-sm flex items-center gap-1"><Clock className="h-3 w-3" /> {application.program.duration}</span>
-                                    <span className="rounded-full bg-white px-3 py-1 font-semibold text-brand-orange shadow-sm">{application.program.currency} {application.program.tuitionFee.toLocaleString()}/yr</span>
-                                </div>
-                            </div>
-                        </motion.div>
+                {/* Progress Bar */}
+                <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-neutral-100">
+                    <motion.div
+                        className="h-full rounded-full bg-gradient-to-r from-brand-orange to-brand-purple"
+                        animate={{ width: `${application.progress}%` }}
+                        transition={{ duration: 0.8 }}
+                    />
+                </div>
 
-                        {/* Application Timeline */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                            className="rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm">
-                            <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
-                                <Calendar className="h-5 w-5 text-brand-purple" /> Application Timeline
-                            </h3>
-                            <div className="mt-4 space-y-0">
-                                {application.timeline.map((step, i) => (
-                                    <div key={step.step} className="flex items-start gap-4">
-                                        <div className="flex flex-col items-center">
-                                            <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.done ? "bg-emerald-500" : step.active ? "bg-brand-orange animate-pulse" : "bg-neutral-200"}`}>
-                                                {step.done ? <CheckCircle className="h-3.5 w-3.5 text-white" /> :
-                                                    step.active ? <Clock className="h-3.5 w-3.5 text-white" /> :
-                                                        <div className="h-2 w-2 rounded-full bg-neutral-400" />}
+                {statusMessage && (
+                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                        className={`mt-3 text-xs font-semibold ${statusMessage.includes("success") ? "text-emerald-600" : "text-red-500"}`}>
+                        {statusMessage}
+                    </motion.p>
+                )}
+            </motion.div>
+
+            {/* ─── MAIN CONTENT GRID ─── */}
+            <div className="grid gap-6 lg:grid-cols-3">
+                {/* ─── LEFT COLUMN ─── */}
+                <div className="space-y-6 lg:col-span-2">
+                    {/* Student Profile */}
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
+                            <User className="h-5 w-5 text-brand-purple" /> Student Profile
+                        </h3>
+                        <div className="mt-4 flex items-start gap-4">
+                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-purple to-brand-orange text-lg font-bold text-white">
+                                {application.student.fullName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                            </div>
+                            <div>
+                                <p className="text-lg font-bold text-neutral-900">{application.student.fullName}</p>
+                                <p className="text-sm text-neutral-500">Member since {application.student.memberSince}</p>
+                            </div>
+                        </div>
+                        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                            {[
+                                { icon: Mail, label: "Email", value: application.student.email },
+                                { icon: Phone, label: "Phone", value: application.student.phone },
+                                { icon: Globe, label: "Nationality", value: application.student.nationality },
+                                { icon: MapPin, label: "Current City", value: application.student.currentCity },
+                            ].map((item) => (
+                                <div key={item.label} className="flex items-center gap-3 rounded-xl bg-neutral-50 px-4 py-3">
+                                    <item.icon className="h-4 w-4 shrink-0 text-neutral-400" />
+                                    <div>
+                                        <p className="text-[10px] font-bold text-neutral-400 uppercase">{item.label}</p>
+                                        <p className="text-sm font-medium text-neutral-800">{item.value}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+
+                    {/* Program Details */}
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
+                            <GraduationCap className="h-5 w-5 text-brand-orange" /> Program Details
+                        </h3>
+                        <div className="mt-4 rounded-xl bg-gradient-to-r from-brand-purple/5 to-brand-orange/5 p-5">
+                            <p className="text-lg font-bold text-neutral-900 font-[family-name:var(--font-heading)]">{application.program.title}</p>
+                            <div className="mt-1 flex items-center gap-2 text-sm text-neutral-600">
+                                <Building2 className="h-4 w-4 text-neutral-400" />
+                                <span>{application.university.name}</span>
+                                <span className="text-neutral-300">•</span>
+                                <span>{application.university.location}</span>
+                            </div>
+                            <div className="mt-3 flex flex-wrap gap-3 text-xs">
+                                <span className="rounded-full bg-white px-3 py-1 font-semibold text-neutral-700 shadow-sm">{application.program.level}</span>
+                                <span className="rounded-full bg-white px-3 py-1 font-semibold text-neutral-700 shadow-sm flex items-center gap-1"><Clock className="h-3 w-3" /> {application.program.duration}</span>
+                                <span className="rounded-full bg-white px-3 py-1 font-semibold text-brand-orange shadow-sm">{application.program.currency} {application.program.tuitionFee.toLocaleString()}/yr</span>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* Application Timeline */}
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
+                            <Calendar className="h-5 w-5 text-brand-purple" /> Application Timeline
+                        </h3>
+                        <div className="mt-4 space-y-0">
+                            {application.timeline.map((step, i) => (
+                                <div key={step.step} className="flex items-start gap-4">
+                                    <div className="flex flex-col items-center">
+                                        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${step.done ? "bg-emerald-500" : step.active ? "bg-brand-orange animate-pulse" : "bg-neutral-200"}`}>
+                                            {step.done ? <CheckCircle className="h-3.5 w-3.5 text-white" /> :
+                                                step.active ? <Clock className="h-3.5 w-3.5 text-white" /> :
+                                                    <div className="h-2 w-2 rounded-full bg-neutral-400" />}
+                                        </div>
+                                        {i < application.timeline.length - 1 && (
+                                            <div className={`w-0.5 h-8 ${step.done ? "bg-emerald-300" : "bg-neutral-200"}`} />
+                                        )}
+                                    </div>
+                                    <div className="pb-6">
+                                        <p className={`text-sm font-medium ${step.done ? "text-neutral-800" : step.active ? "text-brand-orange font-semibold" : "text-neutral-400"}`}>
+                                            {step.step}
+                                        </p>
+                                        <p className="text-xs text-neutral-400">{step.date}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+                        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 className="flex items-center gap-2 text-sm font-bold text-gray-800">
+                            <History className="h-4 w-4 text-brand-purple" /> Activity History
+                        </h3>
+
+                        {application.auditLogs.length > 0 ? (
+                            <div className="mt-4 max-h-[400px] overflow-y-auto pr-1">
+                                <div className="relative border-l-2 border-gray-200 pl-6 space-y-4 ml-2">
+                                    {application.auditLogs.map((log) => (
+                                        <div key={log.id} className="relative">
+                                            <div className="absolute -left-[31px] top-1 h-3 w-3 rounded-full border-2 border-white bg-brand-purple" />
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <StatusBadge status={log.action} />
+                                                <span className="text-xs text-gray-400">{log.createdAt}</span>
                                             </div>
-                                            {i < application.timeline.length - 1 && (
-                                                <div className={`w-0.5 h-8 ${step.done ? "bg-emerald-300" : "bg-neutral-200"}`} />
+                                            <p className="mt-1 text-xs text-gray-500">by <span className="font-semibold text-gray-700">{log.userEmail}</span></p>
+                                            {log.details && (
+                                                <p className="mt-1 text-xs text-gray-600">{log.details}</p>
                                             )}
                                         </div>
-                                        <div className="pb-6">
-                                            <p className={`text-sm font-medium ${step.done ? "text-neutral-800" : step.active ? "text-brand-orange font-semibold" : "text-neutral-400"}`}>
-                                                {step.step}
-                                            </p>
-                                            <p className="text-xs text-neutral-400">{step.date}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
-                        </motion.div>
+                        ) : (
+                            <div className="mt-4 flex flex-col items-center py-8 text-center">
+                                <History className="h-8 w-8 text-gray-200" />
+                                <p className="mt-2 text-sm text-gray-400">No activity recorded yet.</p>
+                            </div>
+                        )}
+                    </motion.div>
+                </div>
 
-                        {/* ─── Activity History ─── */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-                            className="rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm">
-                            <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
-                                <History className="h-5 w-5 text-brand-purple" /> Activity History
-                            </h3>
+                {/* ─── RIGHT COLUMN ─── */}
+                <div className="space-y-6">
+                    {/* Documents Review */}
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+                        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
+                            <FileText className="h-5 w-5 text-brand-orange" /> Documents
+                        </h3>
 
-                            {application.auditLogs.length > 0 ? (
-                                <div className="mt-4 space-y-3 max-h-[400px] overflow-y-auto pr-1">
-                                    {application.auditLogs.map((log) => {
-                                        const actionStyle = ACTION_LABELS[log.action] || { label: log.action, color: "bg-neutral-100 text-neutral-700" };
-                                        return (
-                                            <div key={log.id} className="flex items-start gap-3 rounded-xl bg-neutral-50 p-4">
-                                                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-purple/10">
-                                                    <History className="h-4 w-4 text-brand-purple" />
+                        {application.documents.length > 0 ? (
+                            <div className="mt-4 space-y-3">
+                                {application.documents.map((doc) => (
+                                    <div key={doc.id} className="rounded-xl border border-neutral-100 bg-neutral-50 p-4 transition-all hover:shadow-sm">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${doc.status === "VERIFIED" ? "bg-emerald-100" : doc.status === "PENDING" ? "bg-amber-100" : "bg-neutral-100"}`}>
+                                                    {doc.status === "VERIFIED" ? <CheckCircle className="h-4 w-4 text-emerald-600" /> :
+                                                        doc.status === "PENDING" ? <Clock className="h-4 w-4 text-amber-600" /> :
+                                                            <AlertCircle className="h-4 w-4 text-neutral-400" />}
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${actionStyle.color}`}>
-                                                            {actionStyle.label}
-                                                        </span>
-                                                        <span className="text-[10px] text-neutral-400">{log.createdAt}</span>
-                                                    </div>
-                                                    <p className="mt-1 text-xs text-neutral-500">by <span className="font-semibold text-neutral-700">{log.userEmail}</span></p>
-                                                    {log.details && (
-                                                        <p className="mt-1 text-xs text-neutral-600">{log.details}</p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            ) : (
-                                <div className="mt-4 flex flex-col items-center py-8 text-center">
-                                    <History className="h-8 w-8 text-neutral-300" />
-                                    <p className="mt-2 text-sm text-neutral-400">No activity recorded yet.</p>
-                                </div>
-                            )}
-                        </motion.div>
-                    </div>
-
-                    {/* ─── RIGHT COLUMN ─── */}
-                    <div className="space-y-6">
-                        {/* Documents Review */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-                            className="rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm">
-                            <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
-                                <FileText className="h-5 w-5 text-brand-orange" /> Documents
-                            </h3>
-
-                            {application.documents.length > 0 ? (
-                                <div className="mt-4 space-y-3">
-                                    {application.documents.map((doc) => (
-                                        <div key={doc.id} className="rounded-xl border border-neutral-100 bg-neutral-50 p-4 transition-all hover:shadow-sm">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-3 min-w-0">
-                                                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${doc.status === "VERIFIED" ? "bg-emerald-100" : doc.status === "PENDING" ? "bg-amber-100" : "bg-neutral-100"}`}>
-                                                        {doc.status === "VERIFIED" ? <CheckCircle className="h-4 w-4 text-emerald-600" /> :
-                                                            doc.status === "PENDING" ? <Clock className="h-4 w-4 text-amber-600" /> :
-                                                                <AlertCircle className="h-4 w-4 text-neutral-400" />}
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <p className="truncate text-sm font-semibold text-neutral-800">{doc.name}</p>
-                                                        <p className="text-[10px] text-neutral-400">
-                                                            {doc.status === "VERIFIED" ? "Verified" : doc.status === "PENDING" ? "Pending Review" : "Missing"}
-                                                            {doc.date && ` • ${doc.date}`}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Re-upload badge */}
-                                            {doc.requiresReupload && (
-                                                <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
-                                                    <p className="text-[10px] font-bold text-amber-700 flex items-center gap-1">
-                                                        <RotateCcw className="h-3 w-3" /> Re-upload Requested
+                                                <div className="min-w-0">
+                                                    <p className="truncate text-sm font-semibold text-neutral-800">{doc.name}</p>
+                                                    <p className="text-[10px] text-neutral-400">
+                                                        {doc.status === "VERIFIED" ? "Verified" : doc.status === "PENDING" ? "Pending Review" : "Missing"}
+                                                        {doc.date && ` • ${doc.date}`}
                                                     </p>
-                                                    {doc.adminFeedback && (
-                                                        <p className="mt-1 text-[10px] text-amber-600 italic">&quot;{doc.adminFeedback}&quot;</p>
-                                                    )}
                                                 </div>
-                                            )}
-
-                                            {/* Action buttons */}
-                                            {doc.fileUrl ? (
-                                                <div className="mt-3 flex items-center gap-2">
-                                                    <a
-                                                        href={doc.fileUrl}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-purple/10 px-3 py-2 text-[11px] font-bold text-brand-purple transition-all hover:bg-brand-purple hover:text-white"
-                                                    >
-                                                        <Eye className="h-3 w-3" /> View
-                                                    </a>
-                                                    <a
-                                                        href={doc.fileUrl}
-                                                        download={doc.fileName || doc.name}
-                                                        className="flex items-center justify-center gap-1.5 rounded-lg bg-neutral-100 px-3 py-2 text-[11px] font-bold text-neutral-600 transition-all hover:bg-neutral-200"
-                                                    >
-                                                        <Download className="h-3 w-3" />
-                                                    </a>
-                                                    <button
-                                                        onClick={() => setReuploadModal({ docId: doc.id, docName: doc.name })}
-                                                        className="flex items-center justify-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-[11px] font-bold text-amber-600 transition-all hover:bg-amber-100"
-                                                        title="Request Re-upload"
-                                                    >
-                                                        <RotateCcw className="h-3 w-3" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteDoc(doc.id)}
-                                                        disabled={!!docActions[doc.id]}
-                                                        className="flex items-center justify-center gap-1.5 rounded-lg bg-red-50 px-3 py-2 text-[11px] font-bold text-red-500 transition-all hover:bg-red-100 disabled:opacity-50"
-                                                        title="Delete Document"
-                                                    >
-                                                        {docActions[doc.id] ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
-                                                    </button>
-                                                </div>
-                                            ) : doc.status === "MISSING" ? (
-                                                <p className="mt-3 text-center text-[10px] text-neutral-400 italic">Not uploaded by student</p>
-                                            ) : null}
+                                            </div>
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="mt-4 flex flex-col items-center py-8 text-center">
-                                    <FileText className="h-8 w-8 text-neutral-300" />
-                                    <p className="mt-2 text-sm text-neutral-400">No documents submitted.</p>
-                                </div>
-                            )}
-                        </motion.div>
 
-                        {/* Admin Actions */}
-                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                            className="rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm">
-                            <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
-                                <Shield className="h-5 w-5 text-brand-purple" /> Quick Actions
-                            </h3>
-                            <div className="mt-4 space-y-2">
-                                {currentStatus === "SUBMITTED" && (
-                                    <button onClick={() => handleStatusChange("UNDER_REVIEW")}
-                                        className="w-full rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm font-bold text-amber-700 transition-all hover:bg-amber-100">
-                                        Start Review →
-                                    </button>
-                                )}
-                                {currentStatus === "UNDER_REVIEW" && (
-                                    <>
-                                        <button onClick={() => handleStatusChange("OFFER_RECEIVED")}
-                                            className="w-full rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-100">
-                                            Send Offer ✉️
-                                        </button>
-                                        <button onClick={() => handleStatusChange("REJECTED")}
-                                            className="w-full rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm font-bold text-red-600 transition-all hover:bg-red-100">
-                                            Reject Application
-                                        </button>
-                                    </>
-                                )}
-                                {(currentStatus === "OFFER_RECEIVED" || currentStatus === "OFFER_ACCEPTED") && (
-                                    <button onClick={() => handleStatusChange("VISA_PROCESSING")}
-                                        className="w-full rounded-xl bg-purple-50 border border-purple-200 px-4 py-3 text-sm font-bold text-purple-700 transition-all hover:bg-purple-100">
-                                        Begin Visa Processing 🛂
-                                    </button>
-                                )}
-                                {currentStatus === "VISA_PROCESSING" && (
-                                    <button onClick={() => handleStatusChange("ENROLLED")}
-                                        className="w-full rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm font-bold text-green-700 transition-all hover:bg-green-100">
-                                        Confirm Enrollment 🎓
-                                    </button>
-                                )}
+                                        {/* Re-upload badge */}
+                                        {doc.requiresReupload && (
+                                            <div className="mt-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+                                                <p className="text-[10px] font-bold text-amber-700 flex items-center gap-1">
+                                                    <RotateCcw className="h-3 w-3" /> Re-upload Requested
+                                                </p>
+                                                {doc.adminFeedback && (
+                                                    <p className="mt-1 text-[10px] text-amber-600 italic">&quot;{doc.adminFeedback}&quot;</p>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* Action buttons */}
+                                        {doc.fileUrl ? (
+                                            <div className="mt-3 flex items-center gap-2">
+                                                <a
+                                                    href={doc.fileUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-purple/10 px-3 py-2 text-[11px] font-bold text-brand-purple transition-all hover:bg-brand-purple hover:text-white"
+                                                >
+                                                    <Eye className="h-3 w-3" /> View
+                                                </a>
+                                                <a
+                                                    href={doc.fileUrl}
+                                                    download={doc.fileName || doc.name}
+                                                    className="flex items-center justify-center gap-1.5 rounded-lg bg-neutral-100 px-3 py-2 text-[11px] font-bold text-neutral-600 transition-all hover:bg-neutral-200"
+                                                >
+                                                    <Download className="h-3 w-3" />
+                                                </a>
+                                                <button
+                                                    onClick={() => setReuploadModal({ docId: doc.id, docName: doc.name })}
+                                                    className="flex items-center justify-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-[11px] font-bold text-amber-600 transition-all hover:bg-amber-100"
+                                                    title="Request Re-upload"
+                                                >
+                                                    <RotateCcw className="h-3 w-3" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteDoc(doc.id)}
+                                                    disabled={!!docActions[doc.id]}
+                                                    className="flex items-center justify-center gap-1.5 rounded-lg bg-red-50 px-3 py-2 text-[11px] font-bold text-red-500 transition-all hover:bg-red-100 disabled:opacity-50"
+                                                    title="Delete Document"
+                                                >
+                                                    {docActions[doc.id] ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
+                                                </button>
+                                            </div>
+                                        ) : doc.status === "MISSING" ? (
+                                            <p className="mt-3 text-center text-[10px] text-neutral-400 italic">Not uploaded by student</p>
+                                        ) : null}
+                                    </div>
+                                ))}
                             </div>
-                        </motion.div>
-                    </div>
+                        ) : (
+                            <div className="mt-4 flex flex-col items-center py-8 text-center">
+                                <FileText className="h-8 w-8 text-neutral-300" />
+                                <p className="mt-2 text-sm text-neutral-400">No documents submitted.</p>
+                            </div>
+                        )}
+                    </motion.div>
+
+                    {/* Admin Actions */}
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)]">
+                            <Shield className="h-5 w-5 text-brand-purple" /> Quick Actions
+                        </h3>
+                        <div className="mt-4 space-y-2">
+                            {currentStatus === "SUBMITTED" && (
+                                <button onClick={() => handleStatusChange("UNDER_REVIEW")}
+                                    className="w-full rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm font-bold text-amber-700 transition-all hover:bg-amber-100">
+                                    Start Review →
+                                </button>
+                            )}
+                            {currentStatus === "UNDER_REVIEW" && (
+                                <>
+                                    <button onClick={() => handleStatusChange("OFFER_RECEIVED")}
+                                        className="w-full rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-100">
+                                        Send Offer ✉️
+                                    </button>
+                                    <button onClick={() => handleStatusChange("REJECTED")}
+                                        className="w-full rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm font-bold text-red-600 transition-all hover:bg-red-100">
+                                        Reject Application
+                                    </button>
+                                </>
+                            )}
+                            {(currentStatus === "OFFER_RECEIVED" || currentStatus === "OFFER_ACCEPTED") && (
+                                <button onClick={() => handleStatusChange("VISA_PROCESSING")}
+                                    className="w-full rounded-xl bg-purple-50 border border-purple-200 px-4 py-3 text-sm font-bold text-purple-700 transition-all hover:bg-purple-100">
+                                    Begin Visa Processing 🛂
+                                </button>
+                            )}
+                            {currentStatus === "VISA_PROCESSING" && (
+                                <button onClick={() => handleStatusChange("ENROLLED")}
+                                    className="w-full rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm font-bold text-green-700 transition-all hover:bg-green-100">
+                                    Confirm Enrollment 🎓
+                                </button>
+                            )}
+                        </div>
+                    </motion.div>
                 </div>
             </div>
 
@@ -499,24 +474,24 @@ export default function AdminApplicationClient({ application }: { application: A
                             className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl"
                         >
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-bold text-neutral-900 font-[family-name:var(--font-heading)]">Request Re-upload</h3>
+                                <h3 className="text-lg font-bold text-gray-900 font-[family-name:var(--font-heading)]">Request Re-upload</h3>
                                 <button onClick={() => { setReuploadModal(null); setReuploadFeedback(""); }}>
-                                    <X className="h-5 w-5 text-neutral-400 hover:text-neutral-700" />
+                                    <X className="h-5 w-5 text-gray-400 hover:text-gray-700" />
                                 </button>
                             </div>
-                            <p className="text-sm text-neutral-500 mb-1">Document: <span className="font-semibold text-neutral-800">{reuploadModal.docName}</span></p>
-                            <p className="text-xs text-neutral-400 mb-4">Provide feedback explaining why the student needs to re-upload this document.</p>
+                            <p className="text-sm text-gray-500 mb-1">Document: <span className="font-semibold text-gray-800">{reuploadModal.docName}</span></p>
+                            <p className="text-xs text-gray-400 mb-4">Provide feedback explaining why the student needs to re-upload this document.</p>
                             <textarea
                                 value={reuploadFeedback}
                                 onChange={(e) => setReuploadFeedback(e.target.value)}
                                 placeholder="e.g. Document is blurry, please upload a clearer scan..."
                                 rows={3}
-                                className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800 placeholder:text-neutral-400 focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20"
+                                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20"
                             />
                             <div className="mt-4 flex gap-3">
                                 <button
                                     onClick={() => { setReuploadModal(null); setReuploadFeedback(""); }}
-                                    className="flex-1 rounded-xl border border-neutral-200 px-4 py-2.5 text-sm font-semibold text-neutral-600 transition-all hover:bg-neutral-50"
+                                    className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-600 transition-all hover:bg-gray-50"
                                 >
                                     Cancel
                                 </button>
@@ -533,6 +508,6 @@ export default function AdminApplicationClient({ application }: { application: A
                     </>
                 )}
             </AnimatePresence>
-        </div>
+        </AdminCMSLayout>
     );
 }
