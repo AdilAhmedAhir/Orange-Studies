@@ -3,6 +3,8 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
     ArrowLeft, ArrowRight, GraduationCap, Clock, DollarSign,
     MapPin, BookOpen, CheckCircle, Star, Award, Briefcase,
@@ -48,6 +50,16 @@ export default function ProgramDetailClient({ course, university }: ProgramDetai
     const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
     const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
     const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+    const router = useRouter();
+    const { status } = useSession();
+
+    const handleApply = () => {
+        if (status === "unauthenticated") {
+            router.push(`/login?callbackUrl=/apply/${course.slug}`);
+        } else {
+            router.push(`/apply/${course.slug}`);
+        }
+    };
 
     return (
         <>
@@ -171,10 +183,10 @@ export default function ProgramDetailClient({ course, university }: ProgramDetai
                                     <Sparkles className="mx-auto h-10 w-10 text-white/90" />
                                     <h3 className="mt-3 text-xl font-bold text-white font-[family-name:var(--font-heading)]">Ready to Apply?</h3>
                                     <p className="mt-2 text-sm text-white/80">Start your application for {course.title} at {university.name}</p>
-                                    <Link href={`/apply/${course.slug}`}
+                                    <button onClick={handleApply}
                                         className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-8 py-4 text-lg font-black text-brand-orange shadow-lg transition-all hover:shadow-xl hover:scale-[1.03] active:scale-[0.98]">
                                         Apply Now <ArrowRight className="h-5 w-5" />
-                                    </Link>
+                                    </button>
                                     <p className="mt-3 text-[10px] text-white/60">Deadline: {course.applicationDeadline}</p>
                                 </div>
                             </motion.div>

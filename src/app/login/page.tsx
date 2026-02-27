@@ -1,8 +1,9 @@
 "use client";
 
+import { Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import {
@@ -12,8 +13,11 @@ import {
 import { LogoIcon } from "@/components/ui/LogoIcon";
 import { registerUser } from "@/app/actions/auth";
 
-export default function LoginPage() {
+function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || "/dashboard/student";
+
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +51,7 @@ export default function LoginPage() {
                 setError("Invalid email or password.");
                 setIsLoading(false);
             } else if (res?.ok) {
-                router.push("/dashboard/student");
+                router.push(callbackUrl);
             }
         } else {
             // ─── Create Account ───
@@ -75,7 +79,7 @@ export default function LoginPage() {
                 setError("Account created but auto-login failed. Please sign in.");
                 setIsLoading(false);
             } else if (signInRes?.ok) {
-                router.push("/dashboard/student");
+                router.push(callbackUrl);
             }
         }
     };
@@ -277,5 +281,17 @@ export default function LoginPage() {
                 </motion.div>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center bg-neutral-50">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-orange border-t-transparent" />
+            </div>
+        }>
+            <LoginForm />
+        </Suspense>
     );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -55,6 +55,18 @@ export function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [showPill, setShowPill] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const [hidden, setHidden] = useState(false);
+
+    /* ── Smart scroll: hide on scroll-down, show on scroll-up ── */
+    const { scrollY } = useScroll();
+    useMotionValueEvent(scrollY, "change", (latest) => {
+        const previous = scrollY.getPrevious() ?? 0;
+        if (latest > 150 && latest > previous) {
+            setHidden(true);
+        } else {
+            setHidden(false);
+        }
+    });
 
     if (isPortal) return null;
 
@@ -81,7 +93,10 @@ export function Navbar() {
             {/* ════════════════════════════════════════════════════
              * FULL-WIDTH NAVBAR — always visible at top, fades out when pill appears
              * ════════════════════════════════════════════════════ */}
-            <header
+            <motion.header
+                variants={{ visible: { y: 0 }, hidden: { y: "-100%" } }}
+                animate={hidden && !isMobileOpen ? "hidden" : "visible"}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
                 className={`absolute top-0 left-0 right-0 z-50 lg:fixed transition-all duration-500 ${showPill
                     ? "lg:pointer-events-none lg:-translate-y-full lg:opacity-0"
                     : "translate-y-0 opacity-100"
@@ -178,7 +193,7 @@ export function Navbar() {
                         </button>
                     </div>
                 </nav>
-            </header>
+            </motion.header>
 
             {/* ════════════════════════════════════════════════════
              * COLLAPSED: DESKTOP FLOATING PILL
