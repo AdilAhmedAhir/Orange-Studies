@@ -5,7 +5,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
-export async function submitApplication(programId: string) {
+interface DocumentUrls {
+    passportUrl?: string;
+    transcriptsUrl?: string;
+    ieltsUrl?: string;
+    sopUrl?: string;
+}
+
+export async function submitApplication(programId: string, documentUrls: DocumentUrls = {}) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -39,7 +46,7 @@ export async function submitApplication(programId: string) {
         return { success: false, error: "You have already applied to this program." };
     }
 
-    // Create application with timeline steps and mock documents
+    // Create application with timeline steps
     const application = await prisma.application.create({
         data: {
             userId: user.id,
@@ -59,17 +66,33 @@ export async function submitApplication(programId: string) {
         },
     });
 
-    // Create mock document records for the user
-    await prisma.document.createMany({
-        data: [
-            { name: "Passport Copy", fileName: "passport.pdf", fileUrl: "mock_url/passport.pdf", status: "PENDING", userId: user.id },
-            { name: "Academic Transcripts", fileName: "transcripts.pdf", fileUrl: "mock_url/transcripts.pdf", status: "PENDING", userId: user.id },
-            { name: "IELTS Certificate", fileName: "ielts.pdf", fileUrl: "mock_url/ielts.pdf", status: "PENDING", userId: user.id },
-            { name: "Statement of Purpose", fileName: "sop.pdf", fileUrl: "mock_url/sop.pdf", status: "PENDING", userId: user.id },
-        ],
-    });
+    // Create document records with real URLs (or skip if not uploaded)
+    const docEntries: { name: string; fileName: string; fileUrl: string; status: "PENDING" | "MISSING"; userId: string }[] = [];
+
+    const docMap: { key: keyof DocumentUrls; name: string; fileName: string }[] = [
+        { key: "passportUrl", name: "Passport Copy", fileName: "passport.pdf" },
+        { key: "transcriptsUrl", name: "Academic Transcripts", fileName: "transcripts.pdf" },
+        { key: "ieltsUrl", name: "IELTS Certificate", fileName: "ielts.pdf" },
+        { key: "sopUrl", name: "Statement of Purpose", fileName: "sop.pdf" },
+    ];
+
+    for (const doc of docMap) {
+        const url = documentUrls[doc.key];
+        docEntries.push({
+            name: doc.name,
+            fileName: doc.fileName,
+            fileUrl: url || "",
+            status: url ? "PENDING" : "MISSING",
+            userId: user.id,
+        });
+    }
+
+    if (docEntries.length > 0) {
+        await prisma.document.createMany({ data: docEntries });
+    }
 
     revalidatePath("/dashboard/student");
+    revalidatePath("/dashboard/admin");
 
     return { success: true, applicationId: application.id, refCode: application.refCode };
 }

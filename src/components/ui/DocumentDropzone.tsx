@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useCallback } from "react";
 import { Upload, CheckCircle, FileText, X, AlertCircle } from "lucide-react";
+import { uploadFile } from "@/app/actions/upload";
 
 interface DocumentDropzoneProps {
     label: string;
@@ -10,58 +11,92 @@ interface DocumentDropzoneProps {
     accept?: string;
     required?: boolean;
     onFileSelect: (file: File | null) => void;
+    onUploadComplete?: (url: string) => void;
     uploaded?: boolean;
 }
 
-export function DocumentDropzone({ label, description, accept = ".pdf,.doc,.docx,.jpg,.png", required = true, onFileSelect, uploaded = false }: DocumentDropzoneProps) {
+export function DocumentDropzone({
+    label,
+    description,
+    accept = ".pdf,.doc,.docx,.jpg,.png",
+    required = true,
+    onFileSelect,
+    onUploadComplete,
+    uploaded = false,
+}: DocumentDropzoneProps) {
     const [isDragOver, setIsDragOver] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [fileName, setFileName] = useState<string | null>(null);
     const [isComplete, setIsComplete] = useState(uploaded);
+    const [error, setError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const simulateUpload = useCallback((file: File) => {
+    const handleUpload = useCallback(async (file: File) => {
         setIsUploading(true);
         setUploadProgress(0);
         setFileName(file.name);
+        setError(null);
 
-        // Simulate progress on an interval
+        // Simulate initial progress while uploading
         let progress = 0;
-        const interval = setInterval(() => {
-            progress += Math.random() * 25 + 10;
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(interval);
-                setTimeout(() => {
-                    setIsUploading(false);
-                    setIsComplete(true);
-                    onFileSelect(file);
-                }, 300);
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 15 + 5;
+            if (progress >= 85) {
+                progress = 85;
+                clearInterval(progressInterval);
             }
-            setUploadProgress(Math.min(progress, 100));
-        }, 200);
-    }, [onFileSelect]);
+            setUploadProgress(Math.min(progress, 85));
+        }, 300);
+
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const result = await uploadFile(formData);
+
+            clearInterval(progressInterval);
+            setUploadProgress(100);
+
+            setTimeout(() => {
+                setIsUploading(false);
+                setIsComplete(true);
+                onFileSelect(file);
+                if (onUploadComplete) {
+                    onUploadComplete(result.url);
+                }
+            }, 300);
+        } catch (err) {
+            clearInterval(progressInterval);
+            setIsUploading(false);
+            setUploadProgress(0);
+            setError(err instanceof Error ? err.message : "Upload failed. Please try again.");
+        }
+    }, [onFileSelect, onUploadComplete]);
 
     const handleDrop = useCallback((e: React.DragEvent) => {
         e.preventDefault();
         setIsDragOver(false);
         const file = e.dataTransfer.files[0];
-        if (file) simulateUpload(file);
-    }, [simulateUpload]);
+        if (file) handleUpload(file);
+    }, [handleUpload]);
 
     const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) simulateUpload(file);
-    }, [simulateUpload]);
+        if (file) handleUpload(file);
+    }, [handleUpload]);
 
     const handleRemove = useCallback(() => {
         setIsComplete(false);
         setFileName(null);
         setUploadProgress(0);
+        setError(null);
         onFileSelect(null);
+        if (onUploadComplete) {
+            onUploadComplete("");
+        }
         if (inputRef.current) inputRef.current.value = "";
-    }, [onFileSelect]);
+    }, [onFileSelect, onUploadComplete]);
 
     return (
         <div className="space-y-2">
@@ -76,6 +111,16 @@ export function DocumentDropzone({ label, description, accept = ".pdf,.doc,.docx
                 )}
             </div>
             <p className="text-xs text-neutral-400">{description}</p>
+
+            {/* Error Message */}
+            {error && (
+                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 px-4 py-2 text-xs text-red-600">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    {error}
+                    <button onClick={() => setError(null)} className="ml-auto"><X className="h-3 w-3" /></button>
+                </motion.div>
+            )}
 
             <AnimatePresence mode="wait">
                 {isComplete && fileName ? (
@@ -92,7 +137,7 @@ export function DocumentDropzone({ label, description, accept = ".pdf,.doc,.docx
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="truncate text-sm font-semibold text-emerald-800">{fileName}</p>
-                            <p className="text-xs text-emerald-500">Upload complete</p>
+                            <p className="text-xs text-emerald-500">Upload complete — saved to cloud</p>
                         </div>
                         <button onClick={handleRemove} className="flex h-8 w-8 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-red-50 hover:text-red-500">
                             <X className="h-4 w-4" />
@@ -134,8 +179,8 @@ export function DocumentDropzone({ label, description, accept = ".pdf,.doc,.docx
                         onDragLeave={() => setIsDragOver(false)}
                         onDrop={handleDrop}
                         className={`group relative cursor-pointer rounded-xl border-2 border-dashed px-6 py-8 text-center transition-all duration-300 ${isDragOver
-                                ? "border-brand-orange bg-brand-orange/5 scale-[1.02]"
-                                : "border-neutral-200 bg-neutral-50 hover:border-brand-purple/40 hover:bg-brand-purple/5"
+                            ? "border-brand-orange bg-brand-orange/5 scale-[1.02]"
+                            : "border-neutral-200 bg-neutral-50 hover:border-brand-purple/40 hover:bg-brand-purple/5"
                             }`}
                     >
                         <motion.div animate={isDragOver ? { y: -4, scale: 1.1 } : { y: 0, scale: 1 }}>

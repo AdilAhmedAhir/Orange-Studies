@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Link from "next/link";
 import {
-    LayoutDashboard, FileText, Upload, User, Calendar, Bell,
+    LayoutDashboard, FileText, Upload, User, Calendar,
     LogOut, ChevronRight, Clock, CheckCircle, AlertCircle,
-    Eye, ArrowRight, MapPin, GraduationCap, DollarSign,
-    Sparkles, Menu, X, BookOpen, MessageCircle, Mail, Search,
+    Eye, ArrowRight, GraduationCap,
+    Sparkles, Menu, X, MessageCircle, Mail, Search,
 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
 
@@ -29,6 +29,7 @@ interface AppData {
 interface DocData {
     name: string;
     status: string;
+    fileUrl: string;
     date: string;
 }
 
@@ -401,13 +402,22 @@ export default function StudentDashboardClient({
                                                                     <Upload className="h-5 w-5 text-neutral-400" />}
                                                         </div>
                                                         <div>
-                                                            <p className="text-sm font-semibold text-neutral-800">{doc.name}</p>
+                                                            {doc.fileUrl ? (
+                                                                <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-neutral-800 hover:text-brand-purple hover:underline transition-colors">{doc.name}</a>
+                                                            ) : (
+                                                                <p className="text-sm font-semibold text-neutral-800">{doc.name}</p>
+                                                            )}
                                                             <p className="text-xs text-neutral-400">
                                                                 {doc.status === "verified" ? `Verified • ${doc.date}` : doc.status === "pending" ? "Under Review" : "Not uploaded"}
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    {doc.status === "missing" && (
+                                                    {doc.fileUrl && (
+                                                        <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="shrink-0 flex items-center gap-1 rounded-lg bg-brand-purple/10 px-3 py-1.5 text-xs font-bold text-brand-purple transition-all hover:bg-brand-purple hover:text-white">
+                                                            <Eye className="h-3 w-3" /> View
+                                                        </a>
+                                                    )}
+                                                    {!doc.fileUrl && doc.status === "missing" && (
                                                         <button className="shrink-0 rounded-lg bg-brand-orange/10 px-3 py-1.5 text-xs font-bold text-brand-orange transition-all hover:bg-brand-orange hover:text-white">
                                                             Upload
                                                         </button>

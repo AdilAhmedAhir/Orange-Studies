@@ -64,6 +64,7 @@ export default async function StudentDashboardPage() {
     const serializedDocs = documents.map((doc) => ({
         name: doc.name,
         status: doc.status.toLowerCase(),
+        fileUrl: doc.fileUrl || "",
         date: doc.updatedAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     }));
 

@@ -65,9 +65,13 @@ export default function ApplicationWizardClient({
     const [documents, setDocuments] = useState<Record<string, File | null>>({
         passport: null, transcripts: null, ielts: null, sop: null,
     });
+    const [docUrls, setDocUrls] = useState<Record<string, string>>({
+        passport: "", transcripts: "", ielts: "", sop: "",
+    });
 
     const updateForm = (field: string, value: string) => setForm((prev) => ({ ...prev, [field]: value }));
     const updateDoc = (key: string, file: File | null) => setDocuments((prev) => ({ ...prev, [key]: file }));
+    const updateDocUrl = (key: string, url: string) => setDocUrls((prev) => ({ ...prev, [key]: url }));
 
     const goBack = () => { setDirection(-1); setCurrentStep((s) => Math.max(s - 1, 1)); };
 
@@ -77,7 +81,12 @@ export default function ApplicationWizardClient({
             setSubmitting(true);
             setSubmitError("");
             try {
-                const result = await submitApplication(programId);
+                const result = await submitApplication(programId, {
+                    passportUrl: docUrls.passport,
+                    transcriptsUrl: docUrls.transcripts,
+                    ieltsUrl: docUrls.ielts,
+                    sopUrl: docUrls.sop,
+                });
                 if (result.success) {
                     setRefCode(result.refCode || "");
                     setDirection(1);
@@ -232,10 +241,10 @@ export default function ApplicationWizardClient({
                                 <p className="mt-2 text-sm text-neutral-500">Upload the required documents for your application. All files are securely processed.</p>
 
                                 <div className="mt-8 space-y-6">
-                                    <DocumentDropzone label="Passport Copy" description="Upload a clear scan or photo of your passport's bio data page." accept=".pdf,.jpg,.jpeg,.png" onFileSelect={(f) => updateDoc("passport", f)} uploaded={!!documents.passport} />
-                                    <DocumentDropzone label="Academic Transcripts" description="Official transcripts from your most recent qualification. Include all semesters." accept=".pdf,.doc,.docx" onFileSelect={(f) => updateDoc("transcripts", f)} uploaded={!!documents.transcripts} />
-                                    <DocumentDropzone label="IELTS / Language Certificate" description="Your English language proficiency test result (IELTS, TOEFL, PTE, etc.)" accept=".pdf,.jpg,.jpeg,.png" onFileSelect={(f) => updateDoc("ielts", f)} uploaded={!!documents.ielts} />
-                                    <DocumentDropzone label="Statement of Purpose (SOP)" description="A personal essay describing your motivation, goals, and why this program is right for you." accept=".pdf,.doc,.docx" onFileSelect={(f) => updateDoc("sop", f)} uploaded={!!documents.sop} />
+                                    <DocumentDropzone label="Passport Copy" description="Upload a clear scan or photo of your passport's bio data page." accept=".pdf,.jpg,.jpeg,.png" onFileSelect={(f) => updateDoc("passport", f)} onUploadComplete={(url) => updateDocUrl("passport", url)} uploaded={!!docUrls.passport} />
+                                    <DocumentDropzone label="Academic Transcripts" description="Official transcripts from your most recent qualification. Include all semesters." accept=".pdf,.doc,.docx" onFileSelect={(f) => updateDoc("transcripts", f)} onUploadComplete={(url) => updateDocUrl("transcripts", url)} uploaded={!!docUrls.transcripts} />
+                                    <DocumentDropzone label="IELTS / Language Certificate" description="Your English language proficiency test result (IELTS, TOEFL, PTE, etc.)" accept=".pdf,.jpg,.jpeg,.png" onFileSelect={(f) => updateDoc("ielts", f)} onUploadComplete={(url) => updateDocUrl("ielts", url)} uploaded={!!docUrls.ielts} />
+                                    <DocumentDropzone label="Statement of Purpose (SOP)" description="A personal essay describing your motivation, goals, and why this program is right for you." accept=".pdf,.doc,.docx" onFileSelect={(f) => updateDoc("sop", f)} onUploadComplete={(url) => updateDocUrl("sop", url)} uploaded={!!docUrls.sop} />
                                 </div>
 
                                 <div className="mt-8 flex items-center gap-3 rounded-xl bg-brand-purple/5 p-4">
@@ -244,7 +253,7 @@ export default function ApplicationWizardClient({
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-neutral-800">
-                                            {Object.values(documents).filter(Boolean).length} of 4 documents uploaded
+                                            {Object.values(docUrls).filter(Boolean).length} of 4 documents uploaded
                                         </p>
                                         <p className="text-xs text-neutral-500">You can proceed and upload remaining documents later.</p>
                                     </div>
@@ -327,14 +336,14 @@ export default function ApplicationWizardClient({
                                             { key: "sop", label: "Statement of Purpose" },
                                         ].map((doc) => (
                                             <div key={doc.key} className="flex items-center gap-3 rounded-lg bg-neutral-50 px-4 py-3">
-                                                {documents[doc.key] ? (
+                                                {docUrls[doc.key] ? (
                                                     <CheckCircle className="h-4 w-4 text-emerald-500" />
                                                 ) : (
                                                     <div className="h-4 w-4 rounded-full border-2 border-neutral-300" />
                                                 )}
                                                 <span className="text-sm text-neutral-700">{doc.label}</span>
-                                                {documents[doc.key] && (
-                                                    <span className="ml-auto text-xs text-neutral-400">{documents[doc.key]!.name}</span>
+                                                {docUrls[doc.key] && (
+                                                    <span className="ml-auto text-xs text-emerald-500">☁️ Cloud</span>
                                                 )}
                                             </div>
                                         ))}
