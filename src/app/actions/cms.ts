@@ -1,19 +1,9 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { randomBytes } from "crypto";
-
-/* ── Helper: auth gate ── */
-async function requireAdmin() {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) return null;
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!user || (user.role !== "ADMIN" && user.role !== "MANAGER")) return null;
-    return user;
-}
+import { requireAdmin } from "@/lib/auth-guards";
 
 function slugify(text: string) {
     return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");

@@ -97,14 +97,8 @@ export async function updateApplicationStatus(
     return { success: true };
 }
 
-/* ── Helper: auth gate ── */
-async function requireAdmin() {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) return null;
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!user || (user.role !== "ADMIN" && user.role !== "MANAGER")) return null;
-    return user;
-}
+/* ── Helper: auth gate (shared) ── */
+import { requireAdmin } from "@/lib/auth-guards";
 
 /* ── Helper: slug generator ── */
 function slugify(text: string) {
@@ -345,6 +339,11 @@ export async function reuploadDocument(
 
         if (currentUser.role === "STUDENT" && doc.userId !== currentUser.id) {
             return { success: false, error: "You do not have permission to modify this document." };
+        }
+
+        // Delete old blob before replacing
+        if (doc.fileUrl) {
+            try { await del(doc.fileUrl); } catch { /* old blob may already be gone */ }
         }
 
         await prisma.document.update({

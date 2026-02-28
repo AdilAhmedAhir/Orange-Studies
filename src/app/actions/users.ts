@@ -1,19 +1,10 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
-
-/* ── Helper: require ADMIN role (not MANAGER) ── */
-async function requireAdmin() {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) return null;
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!user || user.role !== "ADMIN") return null;
-    return user;
-}
+import { del } from "@vercel/blob";
+import { requireAdmin } from "@/lib/auth-guards";
 
 function generatePassword(length = 8): string {
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$";
@@ -33,7 +24,7 @@ export async function createStaffAccount(data: {
     role: "ADMIN" | "MANAGER";
 }): Promise<{ success: boolean; password?: string; error?: string }> {
     try {
-        const admin = await requireAdmin();
+        const admin = await requireAdmin(false);
         if (!admin) return { success: false, error: "Only ADMIN users can create staff accounts." };
 
         if (!data.fullName || !data.email) return { success: false, error: "Name and email are required." };
@@ -70,7 +61,7 @@ export async function changeUserRole(
     newRole: "STUDENT" | "ADMIN" | "MANAGER" | "RECRUITER" | "INSTITUTION"
 ): Promise<{ success: boolean; error?: string }> {
     try {
-        const admin = await requireAdmin();
+        const admin = await requireAdmin(false);
         if (!admin) return { success: false, error: "Only ADMIN users can change roles." };
 
         // Cannot change own role
@@ -90,7 +81,7 @@ export async function changeUserRole(
    ═══════════════════════════════════════════════════════ */
 export async function deleteUser(userId: string): Promise<{ success: boolean; error?: string }> {
     try {
-        const admin = await requireAdmin();
+        const admin = await requireAdmin(false);
         if (!admin) return { success: false, error: "Only ADMIN users can delete accounts." };
 
         if (admin.id === userId) return { success: false, error: "You cannot delete your own account." };
@@ -101,6 +92,16 @@ export async function deleteUser(userId: string): Promise<{ success: boolean; er
             return { success: false, error: `Cannot delete: user has ${appCount} application(s). Remove applications first.` };
         }
 
+        // Clean up user's document blobs before deletion
+        const userDocs = await prisma.document.findMany({
+            where: { userId },
+            select: { fileUrl: true },
+        });
+        const blobUrls = userDocs.map((d) => d.fileUrl).filter(Boolean) as string[];
+        if (blobUrls.length > 0) {
+            try { await del(blobUrls); } catch { /* blobs may already be gone */ }
+        }
+
         await prisma.user.delete({ where: { id: userId } });
         revalidatePath("/dashboard/admin/users");
         return { success: true };
@@ -109,3 +110,4 @@ export async function deleteUser(userId: string): Promise<{ success: boolean; er
         return { success: false, error: msg };
     }
 }
+

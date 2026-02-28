@@ -20,39 +20,43 @@ export default async function AdminDashboardPage() {
         redirect("/");
     }
 
-    // KPI metrics
-    const [totalStudents, totalApplications, pendingReviewCount, totalPrograms, totalUniversities] = await Promise.all([
+    // Concurrent SSR queries — all execute in parallel
+    const [
+        totalStudents,
+        totalApplications,
+        pendingReviewCount,
+        totalPrograms,
+        totalUniversities,
+        statusCounts,
+        recentApps,
+        recentLeads,
+        universities,
+        countries,
+    ] = await Promise.all([
         prisma.user.count({ where: { role: "STUDENT" } }),
         prisma.application.count(),
         prisma.application.count({ where: { status: "SUBMITTED" } }),
         prisma.program.count(),
         prisma.university.count(),
+        prisma.application.groupBy({ by: ["status"], _count: { _all: true } }),
+        prisma.application.findMany({
+            take: 10,
+            orderBy: { createdAt: "desc" },
+            include: {
+                user: { select: { fullName: true, email: true } },
+                program: { include: { university: { select: { name: true } } } },
+            },
+        }),
+        prisma.lead.findMany({ take: 10, orderBy: { createdAt: "desc" } }),
+        prisma.university.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+        prisma.country.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, flag: true } }),
     ]);
 
-    // Status breakdown
-    const statusCounts = await prisma.application.groupBy({
-        by: ["status"],
-        _count: { _all: true },
-    });
-
+    // Serialize raw query results
     const statusBreakdown = statusCounts.map((s) => ({
         status: s.status,
         count: s._count._all,
     }));
-
-    // Recent applications (last 10)
-    const recentApps = await prisma.application.findMany({
-        take: 10,
-        orderBy: { createdAt: "desc" },
-        include: {
-            user: { select: { fullName: true, email: true } },
-            program: {
-                include: {
-                    university: { select: { name: true } },
-                },
-            },
-        },
-    });
 
     const serializedRecent = recentApps.map((app) => ({
         id: app.refCode,
@@ -65,12 +69,6 @@ export default async function AdminDashboardPage() {
         date: app.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     }));
 
-    // Recent leads
-    const recentLeads = await prisma.lead.findMany({
-        take: 10,
-        orderBy: { createdAt: "desc" },
-    });
-
     const serializedLeads = recentLeads.map((lead) => ({
         id: lead.id,
         name: lead.name,
@@ -79,12 +77,6 @@ export default async function AdminDashboardPage() {
         status: lead.status,
         date: lead.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
     }));
-
-    // Universities & countries for CRUD forms
-    const [universities, countries] = await Promise.all([
-        prisma.university.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
-        prisma.country.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true, flag: true } }),
-    ]);
 
     return (
         <AdminDashboardClient
