@@ -45,13 +45,15 @@ export function Navbar() {
 
     const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-    if (isPortal) return null;
-
     // Lock body scroll when mobile menu is open
+    // NOTE: All hooks MUST be called before any conditional return (Rules of Hooks)
     useEffect(() => {
+        if (isPortal) return;
         document.body.style.overflow = isMobileOpen ? "hidden" : "";
         return () => { document.body.style.overflow = ""; };
-    }, [isMobileOpen]);
+    }, [isMobileOpen, isPortal]);
+
+    if (isPortal) return null;
 
     return (
         <>
