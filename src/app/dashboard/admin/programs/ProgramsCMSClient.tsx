@@ -81,10 +81,10 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
                             <tr>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Program</th>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">University</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Level</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Discipline</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Tuition</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Apps</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Level</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Discipline</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Tuition</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Apps</th>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -103,10 +103,10 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-neutral-600 max-w-[150px] truncate">{p.universityName}</td>
-                                    <td className="px-6 py-4"><span className="rounded-full bg-brand-purple/10 px-2.5 py-0.5 text-xs font-bold text-brand-purple">{p.level}</span></td>
-                                    <td className="px-6 py-4 text-xs text-neutral-500 max-w-[120px] truncate">{p.discipline || "—"}</td>
-                                    <td className="px-6 py-4 text-xs text-neutral-500">{p.currency} {p.tuitionFee.toLocaleString()}</td>
-                                    <td className="px-6 py-4"><span className="font-semibold text-neutral-800">{p.applicationCount}</span></td>
+                                    <td className="hidden md:table-cell px-6 py-4"><span className="rounded-full bg-brand-purple/10 px-2.5 py-0.5 text-xs font-bold text-brand-purple">{p.level}</span></td>
+                                    <td className="hidden md:table-cell px-6 py-4 text-xs text-neutral-500 max-w-[120px] truncate">{p.discipline || "—"}</td>
+                                    <td className="hidden md:table-cell px-6 py-4 text-xs text-neutral-500">{p.currency} {p.tuitionFee.toLocaleString()}</td>
+                                    <td className="hidden md:table-cell px-6 py-4"><span className="font-semibold text-neutral-800">{p.applicationCount}</span></td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-1.5">
                                             <button onClick={() => openEdit(p)} className="rounded-lg p-2 text-neutral-400 transition-all hover:bg-brand-purple/10 hover:text-brand-purple"><Pencil className="h-4 w-4" /></button>

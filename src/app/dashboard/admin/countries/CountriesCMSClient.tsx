@@ -93,9 +93,9 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
                         <thead>
                             <tr>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Country</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Code</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Universities</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Description</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Code</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Universities</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Description</th>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -111,9 +111,9 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4"><span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-bold text-neutral-600">{c.code}</span></td>
-                                    <td className="px-6 py-4"><span className="font-semibold text-neutral-800">{c.universityCount}</span></td>
-                                    <td className="px-6 py-4 text-xs text-neutral-500 max-w-[200px] truncate">{c.description || "—"}</td>
+                                    <td className="hidden md:table-cell px-6 py-4"><span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-bold text-neutral-600">{c.code}</span></td>
+                                    <td className="hidden md:table-cell px-6 py-4"><span className="font-semibold text-neutral-800">{c.universityCount}</span></td>
+                                    <td className="hidden md:table-cell px-6 py-4 text-xs text-neutral-500 max-w-[200px] truncate">{c.description || "—"}</td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-1.5">
                                             <button onClick={() => openEdit(c)} className="rounded-lg p-2 text-neutral-400 transition-all hover:bg-brand-purple/10 hover:text-brand-purple"><Pencil className="h-4 w-4" /></button>

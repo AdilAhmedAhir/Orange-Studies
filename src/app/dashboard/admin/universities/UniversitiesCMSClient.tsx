@@ -78,9 +78,9 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
                             <tr>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">University</th>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Country</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Ranking</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Programs</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Tuition</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Ranking</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Programs</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Tuition</th>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -99,9 +99,9 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
                                         </div>
                                     </td>
                                     <td className="px-6 py-4"><span className="text-lg mr-1">{u.countryFlag}</span> {u.countryName}</td>
-                                    <td className="px-6 py-4"><span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-700">#{u.ranking}</span></td>
-                                    <td className="px-6 py-4"><span className="font-semibold text-neutral-800">{u.programCount}</span></td>
-                                    <td className="px-6 py-4 text-xs text-neutral-500">{u.tuitionCurrency} {u.tuitionMin.toLocaleString()} – {u.tuitionMax.toLocaleString()}</td>
+                                    <td className="hidden md:table-cell px-6 py-4"><span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-700">#{u.ranking}</span></td>
+                                    <td className="hidden md:table-cell px-6 py-4"><span className="font-semibold text-neutral-800">{u.programCount}</span></td>
+                                    <td className="hidden md:table-cell px-6 py-4 text-xs text-neutral-500">{u.tuitionCurrency} {u.tuitionMin.toLocaleString()} – {u.tuitionMax.toLocaleString()}</td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-1.5">
                                             <button onClick={() => openEdit(u)} className="rounded-lg p-2 text-neutral-400 transition-all hover:bg-brand-purple/10 hover:text-brand-purple"><Pencil className="h-4 w-4" /></button>
