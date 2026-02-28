@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,6 +17,7 @@ function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/dashboard/student";
+    const [isPending, startTransition] = useTransition();
 
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
@@ -51,7 +52,7 @@ function LoginForm() {
                 setError("Invalid email or password.");
                 setIsLoading(false);
             } else if (res?.ok) {
-                router.push(callbackUrl);
+                startTransition(() => router.push(callbackUrl));
             }
         } else {
             // ─── Create Account ───
@@ -79,7 +80,7 @@ function LoginForm() {
                 setError("Account created but auto-login failed. Please sign in.");
                 setIsLoading(false);
             } else if (signInRes?.ok) {
-                router.push(callbackUrl);
+                startTransition(() => router.push(callbackUrl));
             }
         }
     };
@@ -250,7 +251,7 @@ function LoginForm() {
                             {/* Submit */}
                             <motion.button
                                 type="submit"
-                                disabled={isLoading}
+                                disabled={isLoading || isPending}
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-orange/20 transition-all hover:shadow-xl hover:shadow-brand-orange/30"

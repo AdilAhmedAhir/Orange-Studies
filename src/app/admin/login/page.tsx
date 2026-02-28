@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useTransition } from "react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ const roles = [
 
 function AdminLoginClient() {
     const router = useRouter();
+    const [isPending, startTransition] = useTransition();
     const [selectedRole, setSelectedRole] = useState("admin");
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +39,7 @@ function AdminLoginClient() {
             setError("Invalid credentials.");
             setIsLoading(false);
         } else if (res?.ok) {
-            router.push("/dashboard/admin");
+            startTransition(() => router.push("/dashboard/admin"));
         }
     };
 
@@ -107,7 +108,7 @@ function AdminLoginClient() {
                             </button>
                         </div>
                     </div>
-                    <motion.button type="submit" disabled={isLoading} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                    <motion.button type="submit" disabled={isLoading || isPending} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-orange/30 transition-all hover:shadow-xl hover:shadow-brand-orange/40">
                         {isLoading ? (
                             <motion.div animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }} className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white" />

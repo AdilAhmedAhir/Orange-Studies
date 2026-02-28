@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -52,13 +52,16 @@ export default function ProgramDetailClient({ course, university }: ProgramDetai
     const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
     const router = useRouter();
     const { status } = useSession();
+    const [isPending, startTransition] = useTransition();
 
     const handleApply = () => {
-        if (status === "unauthenticated") {
-            router.push(`/login?callbackUrl=/apply/${course.slug}`);
-        } else {
-            router.push(`/apply/${course.slug}`);
-        }
+        startTransition(() => {
+            if (status === "unauthenticated") {
+                router.push(`/login?callbackUrl=/apply/${course.slug}`);
+            } else {
+                router.push(`/apply/${course.slug}`);
+            }
+        });
     };
 
     return (
