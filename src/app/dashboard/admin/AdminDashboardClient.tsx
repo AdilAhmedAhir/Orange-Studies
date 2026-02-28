@@ -118,7 +118,7 @@ export default function AdminDashboardClient({
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-purple via-brand-deep to-brand-purple p-8 text-white">
                 <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-brand-orange/20 blur-3xl" />
                 <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-white/5 blur-2xl" />
-                <div className="relative z-10 flex items-center justify-between">
+                <div className="relative z-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold font-[family-name:var(--font-heading)]">Welcome back, {adminName} 🛡️</h1>
                         <p className="mt-2 text-sm text-white/60">
@@ -327,7 +327,7 @@ export default function AdminDashboardClient({
                     DATA MANAGEMENT TAB
                    ═══════════════════════════════════════════ */}
             {activeTab === "data" && (
-                <div className="grid gap-6 lg:grid-cols-2">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     {/* ── Create University ── */}
                     <div className="rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm">
                         <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)] mb-4">
@@ -369,13 +369,13 @@ export default function AdminDashboardClient({
                                 <option value="">Select University *</option>
                                 {universities.map((u) => <option key={u.id} value={u.id}>{u.name}</option>)}
                             </select>
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <select value={progForm.level} onChange={(e) => setProgForm({ ...progForm, level: e.target.value })} className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm outline-none focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20">
                                     <option>Bachelor</option><option>Master</option><option>PhD</option><option>Diploma</option>
                                 </select>
                                 <input type="text" placeholder="Duration (e.g. 4 years)" value={progForm.duration} onChange={(e) => setProgForm({ ...progForm, duration: e.target.value })} className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm outline-none focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20" />
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <input type="number" placeholder="Tuition Fee/yr" value={progForm.tuitionFee} onChange={(e) => setProgForm({ ...progForm, tuitionFee: e.target.value })} className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm outline-none focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20" />
                                 <select value={progForm.currency} onChange={(e) => setProgForm({ ...progForm, currency: e.target.value })} className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm outline-none focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20">
                                     <option>USD</option><option>GBP</option><option>EUR</option><option>CAD</option><option>AUD</option><option>MYR</option><option>BDT</option>

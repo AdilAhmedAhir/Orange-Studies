@@ -250,7 +250,7 @@ export default function AdminApplicationClient({ application }: { application: A
                         </h3>
                         <div className="mt-4 rounded-xl bg-gradient-to-r from-brand-purple/5 to-brand-orange/5 p-5">
                             <p className="text-lg font-bold text-neutral-900 font-[family-name:var(--font-heading)]">{application.program.title}</p>
-                            <div className="mt-1 flex items-center gap-2 text-sm text-neutral-600">
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-neutral-600">
                                 <Building2 className="h-4 w-4 text-neutral-400" />
                                 <span>{application.university.name}</span>
                                 <span className="text-neutral-300">•</span>
@@ -371,7 +371,7 @@ export default function AdminApplicationClient({ application }: { application: A
 
                                         {/* Action buttons */}
                                         {doc.fileUrl ? (
-                                            <div className="mt-3 flex items-center gap-2">
+                                            <div className="mt-3 flex flex-wrap items-center gap-2">
                                                 <a
                                                     href={doc.fileUrl}
                                                     target="_blank"
