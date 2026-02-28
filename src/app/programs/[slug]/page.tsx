@@ -1,8 +1,15 @@
 import { notFound } from "next/navigation";
 import { getProgramBySlug } from "@/lib/data";
+import { prisma } from "@/lib/prisma";
 import ProgramDetailClient from "./ProgramDetailClient";
 
 export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+    const programs = await prisma.program.findMany({ select: { slug: true } });
+    return programs.map((p) => ({ slug: p.slug }));
+}
 
 export default async function ProgramDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;

@@ -243,7 +243,7 @@ export default function UniversityDetailClient({ uni }: UniProps) {
                                                 <span className="flex items-center gap-1"><GraduationCap className="h-3 w-3" /> {course.intakeDates.join(", ")}</span>
                                             </div>
                                         </div>
-                                        <Link href={`/programs/${course.slug}`}
+                                        <Link href={`/programs/${course.slug}`} prefetch={true}
                                             className="inline-flex shrink-0 items-center gap-2 rounded-full bg-brand-orange px-6 py-3 text-sm font-bold text-white shadow-lg shadow-brand-orange/20 transition-all hover:shadow-xl hover:shadow-brand-orange/30 hover:scale-105">
                                             View Details <ArrowRight className="h-4 w-4" />
                                         </Link>

@@ -83,6 +83,7 @@ export default async function InstitutionsPage() {
                             <Link
                                 key={uni.id}
                                 href={`/institutions/${uni.slug}`}
+                                prefetch={true}
                                 className="group relative overflow-hidden rounded-2xl border border-neutral-200/60 bg-white p-6 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
                             >
                                 <div className="absolute left-0 top-0 h-full w-1 rounded-l-2xl" style={{ backgroundColor: uni.colorAccent || "#662D91" }} />

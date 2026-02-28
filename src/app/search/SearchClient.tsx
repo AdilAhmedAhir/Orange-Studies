@@ -259,7 +259,7 @@ function SearchContent({ courses }: { courses: CourseItem[] }) {
                                                             {course.currency} {course.tuitionFee.toLocaleString()}
                                                         </p>
                                                     </div>
-                                                    <Link href={`/programs/${course.slug}`}
+                                                    <Link href={`/programs/${course.slug}`} prefetch={true}
                                                         className="flex items-center gap-1.5 rounded-xl bg-brand-orange px-4 py-2.5 text-xs font-bold text-white shadow-sm shadow-brand-orange/20 transition-all hover:shadow-md hover:shadow-brand-orange/30 hover:scale-105">
                                                         View Details <ArrowRight className="h-3.5 w-3.5" />
                                                     </Link>

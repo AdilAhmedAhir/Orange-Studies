@@ -47,6 +47,8 @@ model Country {
   createdAt   DateTime @default(now())
 
   universities University[]
+
+  @@index([slug])
 }
 
 model University {
@@ -79,6 +81,7 @@ model University {
   programs Program[]
 
   @@index([countryId])
+  @@index([slug])
 }
 
 model Program {
@@ -106,6 +109,7 @@ model Program {
   applications Application[]
 
   @@index([universityId])
+  @@index([slug])
 }
 
 // ─── Application Flow ────────────────────────────────

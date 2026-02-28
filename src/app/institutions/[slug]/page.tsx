@@ -1,8 +1,15 @@
 import { notFound } from "next/navigation";
 import { getUniversityBySlug } from "@/lib/data";
+import { prisma } from "@/lib/prisma";
 import UniversityDetailClient from "./UniversityDetailClient";
 
 export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+    const universities = await prisma.university.findMany({ select: { slug: true } });
+    return universities.map((u) => ({ slug: u.slug }));
+}
 
 export default async function UniversityDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;

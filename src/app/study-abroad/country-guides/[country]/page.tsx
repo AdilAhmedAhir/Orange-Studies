@@ -5,6 +5,7 @@ import { CTABanner } from "@/components/home/CTABanner";
 import { Footer } from "@/components/home/Footer";
 
 export const revalidate = 3600;
+export const dynamicParams = true;
 import {
     ArrowLeft,
     GraduationCap,
@@ -138,6 +139,7 @@ export default async function CountryDetailPage({
                             <Link
                                 key={uni.id}
                                 href={`/institutions/${uni.slug}`}
+                                prefetch={true}
                                 className="group relative overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1"
                             >
                                 {/* Accent bar */}

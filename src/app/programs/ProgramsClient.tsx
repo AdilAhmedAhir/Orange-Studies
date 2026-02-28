@@ -203,7 +203,7 @@ export default function ProgramsClient({ programs, disciplines, activeDiscipline
 
                                 {/* Program name → links to program page */}
                                 <h3 className="text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)] leading-tight">
-                                    <Link href={`/programs/${program.slug}`} className="hover:text-brand-purple transition-colors">
+                                    <Link href={`/programs/${program.slug}`} prefetch={true} className="hover:text-brand-purple transition-colors">
                                         {program.title}
                                     </Link>
                                 </h3>
@@ -211,6 +211,7 @@ export default function ProgramsClient({ programs, disciplines, activeDiscipline
                                 {/* University → links to institution page */}
                                 <Link
                                     href={`/institutions/${program.universitySlug}`}
+                                    prefetch={true}
                                     className="mt-1 flex items-center gap-1.5 text-sm text-brand-purple font-medium hover:underline"
                                 >
                                     <GraduationCap className="h-3.5 w-3.5" />
