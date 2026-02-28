@@ -12,6 +12,8 @@ import { Footer } from "@/components/home/Footer";
 import { ScrollToTop } from "@/components/home/ScrollToTop";
 import { StickyMobileCTA } from "@/components/home/StickyMobileCTA";
 
+export const revalidate = 3600;
+
 export default function Home() {
   return (
     <>

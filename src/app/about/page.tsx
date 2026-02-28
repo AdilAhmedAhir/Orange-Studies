@@ -7,6 +7,8 @@ import { Timeline } from "@/components/about/Timeline";
 import { CTABanner } from "@/components/home/CTABanner";
 import { Footer } from "@/components/home/Footer";
 
+export const revalidate = 3600;
+
 export default function AboutPage() {
     return (
         <>

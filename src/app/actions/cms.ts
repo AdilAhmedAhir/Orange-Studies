@@ -9,14 +9,22 @@ function slugify(text: string) {
     return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-function revalidateCMS() {
+function revalidateCMS(opts?: { universitySlug?: string; programSlug?: string; countrySlug?: string }) {
+    // Always purge listing pages and admin dashboards
+    revalidatePath("/");
     revalidatePath("/institutions");
     revalidatePath("/programs");
     revalidatePath("/search");
+    revalidatePath("/study-abroad");
     revalidatePath("/dashboard/admin");
     revalidatePath("/dashboard/admin/universities");
     revalidatePath("/dashboard/admin/programs");
     revalidatePath("/dashboard/admin/countries");
+
+    // Precise slug-level purges for SSG/ISR detail pages
+    if (opts?.universitySlug) revalidatePath(`/institutions/${opts.universitySlug}`);
+    if (opts?.programSlug) revalidatePath(`/programs/${opts.programSlug}`);
+    if (opts?.countrySlug) revalidatePath(`/study-abroad/country-guides/${opts.countrySlug}`);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -39,7 +47,7 @@ export async function upsertCountry(data: CountryPayload): Promise<{ success: bo
 
         if (data.id) {
             // Preserve existing slug on update for SEO
-            await prisma.country.update({
+            const result = await prisma.country.update({
                 where: { id: data.id },
                 data: {
                     name: data.name.trim(),
@@ -49,6 +57,7 @@ export async function upsertCountry(data: CountryPayload): Promise<{ success: bo
                     image: data.image || null,
                 },
             });
+            revalidateCMS({ countrySlug: result.slug || undefined });
         } else {
             // Collision-safe slug
             let slug = slugify(data.name);
@@ -66,7 +75,7 @@ export async function upsertCountry(data: CountryPayload): Promise<{ success: bo
                 },
             });
         }
-        revalidateCMS();
+        revalidateCMS({ countrySlug: data.id ? undefined : slugify(data.name) });
         return { success: true };
     } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Failed.";
@@ -81,8 +90,8 @@ export async function deleteCountry(id: string): Promise<{ success: boolean; err
         // Check for related universities first
         const uniCount = await prisma.university.count({ where: { countryId: id } });
         if (uniCount > 0) return { success: false, error: `Cannot delete: ${uniCount} universities belong to this country.` };
-        await prisma.country.delete({ where: { id } });
-        revalidateCMS();
+        const deleted = await prisma.country.delete({ where: { id } });
+        revalidateCMS({ countrySlug: deleted.slug || undefined });
         return { success: true };
     } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Failed to delete.";
@@ -147,14 +156,15 @@ export async function upsertUniversity(data: UniversityPayload): Promise<{ succe
             // Preserve existing slug on update for SEO
             const { slug: _unused, ...updatePayload } = payload;
             void _unused;
-            await prisma.university.update({ where: { id: data.id }, data: updatePayload });
+            const updated = await prisma.university.update({ where: { id: data.id }, data: updatePayload });
+            revalidateCMS({ universitySlug: updated.slug });
         } else {
             // Collision-safe slug
             const existingSlug = await prisma.university.findUnique({ where: { slug: payload.slug } });
             if (existingSlug) payload.slug += `-${randomBytes(2).toString("hex")}`;
             await prisma.university.create({ data: payload });
         }
-        revalidateCMS();
+        if (!data.id) revalidateCMS({ universitySlug: payload.slug });
         return { success: true };
     } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Failed.";
@@ -168,8 +178,8 @@ export async function deleteUniversity(id: string): Promise<{ success: boolean; 
         if (!admin) return { success: false, error: "Unauthorized." };
         const progCount = await prisma.program.count({ where: { universityId: id } });
         if (progCount > 0) return { success: false, error: `Cannot delete: ${progCount} programs belong to this university.` };
-        await prisma.university.delete({ where: { id } });
-        revalidateCMS();
+        const deleted = await prisma.university.delete({ where: { id } });
+        revalidateCMS({ universitySlug: deleted.slug });
         return { success: true };
     } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Failed to delete.";
@@ -225,14 +235,15 @@ export async function upsertProgram(data: ProgramPayload): Promise<{ success: bo
             // Preserve existing slug on update for SEO
             const { slug: _unused, ...updatePayload } = payload;
             void _unused;
-            await prisma.program.update({ where: { id: data.id }, data: updatePayload });
+            const updated = await prisma.program.update({ where: { id: data.id }, data: updatePayload });
+            revalidateCMS({ programSlug: updated.slug });
         } else {
             // Collision-safe slug
             const existingSlug = await prisma.program.findUnique({ where: { slug: payload.slug } });
             if (existingSlug) payload.slug += `-${randomBytes(2).toString("hex")}`;
             await prisma.program.create({ data: payload });
         }
-        revalidateCMS();
+        if (!data.id) revalidateCMS({ programSlug: payload.slug });
         return { success: true };
     } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Failed.";
@@ -246,8 +257,8 @@ export async function deleteProgram(id: string): Promise<{ success: boolean; err
         if (!admin) return { success: false, error: "Unauthorized." };
         const appCount = await prisma.application.count({ where: { programId: id } });
         if (appCount > 0) return { success: false, error: `Cannot delete: ${appCount} applications reference this program.` };
-        await prisma.program.delete({ where: { id } });
-        revalidateCMS();
+        const deleted = await prisma.program.delete({ where: { id } });
+        revalidateCMS({ programSlug: deleted.slug });
         return { success: true };
     } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Failed to delete.";
