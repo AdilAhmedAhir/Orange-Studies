@@ -1,8 +1,8 @@
 export default function Loading() {
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white pt-24">
             {/* Hero skeleton */}
-            <div className="bg-gradient-to-r from-neutral-100 to-neutral-50 pt-28 lg:pt-32 pb-12 px-6">
+            <div className="bg-gradient-to-r from-neutral-100 to-neutral-50 pt-8 pb-12 px-6">
                 <div className="mx-auto max-w-6xl">
                     <div className="h-10 w-72 rounded-xl bg-neutral-200/60 animate-pulse" />
                     <div className="mt-3 h-5 w-48 rounded-lg bg-neutral-200/40 animate-pulse" />

@@ -118,7 +118,7 @@ export default function UniversityDetailClient({ uni }: UniProps) {
             </section>
 
             {/* ─── TAB NAV ─── */}
-            <section className="sticky top-[72px] lg:top-[80px] z-40 bg-white border-b border-gray-200 w-full">
+            <section className="sticky top-[80px] z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 py-1">
                 <div className="mx-auto flex max-w-6xl gap-0 px-6">
                     {tabs.map((tab) => (
                         <button key={tab} onClick={() => setActiveTab(tab)}

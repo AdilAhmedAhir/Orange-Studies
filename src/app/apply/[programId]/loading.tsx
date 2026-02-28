@@ -1,6 +1,6 @@
 export default function Loading() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-white px-6">
+        <div className="min-h-screen flex items-center justify-center bg-white px-6 pt-24">
             <div className="w-full max-w-2xl space-y-8">
                 {/* Header skeleton */}
                 <div className="text-center space-y-3 pt-28">

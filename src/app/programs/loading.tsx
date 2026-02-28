@@ -1,6 +1,6 @@
 export default function Loading() {
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white pt-24">
             {/* Hero skeleton */}
             <div className="relative min-h-[50vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-neutral-100 to-neutral-50">
                 <div className="text-center space-y-4 px-6">

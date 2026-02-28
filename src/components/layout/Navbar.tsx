@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,48 +39,13 @@ const navLinks: NavLink[] = [
     { name: "Contact", href: "/contact" },
 ];
 
-/* Subset of links for the collapsed pill (too many links would overflow) */
-const pillLinks: { name: string; href: string }[] = [
-    { name: "Home", href: "/" },
-    { name: "Programs", href: "/programs" },
-    { name: "Institutions", href: "/institutions" },
-    { name: "Search", href: "/search" },
-    { name: "Blog", href: "/blog" },
-];
-
 export function Navbar() {
     const pathname = usePathname();
     const isPortal = pathname.startsWith('/dashboard') || pathname.startsWith('/login') || pathname.startsWith('/admin') || pathname.startsWith('/apply');
 
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [showPill, setShowPill] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
-    const [hidden, setHidden] = useState(false);
-
-    /* ── Smart scroll: hide on scroll-down, show on scroll-up ── */
-    const { scrollY } = useScroll();
-    useMotionValueEvent(scrollY, "change", (latest) => {
-        const previous = scrollY.getPrevious() ?? 0;
-        if (latest > 150 && latest > previous) {
-            setHidden(true);
-        } else {
-            setHidden(false);
-        }
-    });
 
     if (isPortal) return null;
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const y = window.scrollY;
-            setIsScrolled(y > 20);
-            setShowPill(y > 600);
-        };
-        /* run once on mount to set initial state */
-        handleScroll();
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
 
     // Lock body scroll when mobile menu is open
     useEffect(() => {
@@ -90,28 +55,17 @@ export function Navbar() {
 
     return (
         <>
-            {/* ════════════════════════════════════════════════════
-             * FULL-WIDTH NAVBAR — always visible at top, fades out when pill appears
-             * ════════════════════════════════════════════════════ */}
-            <motion.header
-                variants={{ visible: { y: 0 }, hidden: { y: "-100%" } }}
-                animate={hidden && !isMobileOpen ? "hidden" : "visible"}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className={`absolute top-0 left-0 right-0 z-50 lg:fixed transition-all duration-500 ${showPill
-                    ? "lg:pointer-events-none lg:-translate-y-full lg:opacity-0"
-                    : "translate-y-0 opacity-100"
-                    } ${isScrolled && !showPill
-                        ? "lg:bg-neutral-900/80 lg:backdrop-blur-xl lg:shadow-lg lg:shadow-black/10"
-                        : "bg-transparent"
-                    }`}
-            >
-                <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+            {/* ═══════════════════════════════════════════
+             * PERMANENT FIXED WHITE NAVBAR
+             * ═══════════════════════════════════════════ */}
+            <header className="fixed top-0 left-0 right-0 z-50 w-full bg-white border-b border-gray-100 h-[80px]">
+                <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 h-full">
                     {/* Logo */}
                     <Link href="/" className="group flex items-center gap-2">
                         <LogoIcon size={40} className="transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110 drop-shadow-md" />
                         <span className="text-xl font-bold font-[family-name:var(--font-heading)]">
-                            <span className="text-white">Orange</span>
-                            <span className="text-brand-orange-light">Studies</span>
+                            <span className="text-neutral-900">Orange</span>
+                            <span className="text-brand-orange">Studies</span>
                         </span>
                     </Link>
 
@@ -121,7 +75,7 @@ export function Navbar() {
                             <div key={link.name} className="group relative">
                                 <Link
                                     href={link.href}
-                                    className="relative flex items-center gap-1 px-4 py-2 text-sm font-medium text-white transition-colors duration-300 hover:text-brand-orange-light"
+                                    className="relative flex items-center gap-1 px-4 py-2 text-sm font-medium text-neutral-600 transition-colors duration-200 hover:text-brand-purple"
                                 >
                                     {link.name}
                                     {link.children && <ChevronDown className="h-3 w-3 transition-transform duration-200 group-hover:rotate-180" />}
@@ -129,12 +83,12 @@ export function Navbar() {
                                 </Link>
                                 {link.children && (
                                     <div className="pointer-events-none absolute left-1/2 top-full pt-2 -translate-x-1/2 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:opacity-100">
-                                        <div className="w-56 rounded-xl border border-white/10 bg-neutral-900/95 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                                        <div className="w-56 rounded-xl border border-neutral-200 bg-white p-2 shadow-xl shadow-neutral-900/5">
                                             {link.children.map((child) => (
                                                 <Link
                                                     key={child.name}
                                                     href={child.href}
-                                                    className="block rounded-lg px-3 py-2.5 text-[13px] font-medium text-white/70 transition-all hover:bg-white/10 hover:text-white hover:pl-4"
+                                                    className="block rounded-lg px-3 py-2.5 text-[13px] font-medium text-neutral-500 transition-all hover:bg-neutral-50 hover:text-neutral-900 hover:pl-4"
                                                 >
                                                     {child.name}
                                                 </Link>
@@ -150,7 +104,7 @@ export function Navbar() {
                     <div className="flex items-center gap-3">
                         <Link
                             href="/login"
-                            className="hidden rounded-full border border-white/20 px-5 py-2 text-sm font-medium text-white/80 transition-all hover:border-white/40 hover:text-white lg:block"
+                            className="hidden rounded-full border border-neutral-200 px-5 py-2 text-sm font-medium text-neutral-600 transition-all hover:border-neutral-300 hover:text-neutral-900 lg:block"
                         >
                             Sign In
                         </Link>
@@ -164,7 +118,7 @@ export function Navbar() {
                         {/* Mobile Menu Toggle */}
                         <button
                             onClick={() => setIsMobileOpen(!isMobileOpen)}
-                            className="relative z-[70] rounded-lg p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors lg:hidden text-white hover:bg-white/10"
+                            className="relative z-[70] rounded-lg p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors lg:hidden text-neutral-700 hover:bg-neutral-100"
                             aria-label="Toggle menu"
                         >
                             <AnimatePresence mode="wait">
@@ -193,110 +147,11 @@ export function Navbar() {
                         </button>
                     </div>
                 </nav>
-            </motion.header>
+            </header>
 
-            {/* ════════════════════════════════════════════════════
-             * COLLAPSED: DESKTOP FLOATING PILL
-             * Shows only after scrolling past hero (600px)
-             * ════════════════════════════════════════════════════ */}
-            <AnimatePresence>
-                {showPill && !isMobileOpen && (
-                    <motion.div
-                        key="pill-nav-desktop"
-                        initial={{ y: -60, opacity: 0, scale: 0.85 }}
-                        animate={{ y: 0, opacity: 1, scale: 1 }}
-                        exit={{ y: -40, opacity: 0, scale: 0.9 }}
-                        transition={{
-                            type: "spring",
-                            stiffness: 200,
-                            damping: 24,
-                            mass: 0.6,
-                        }}
-                        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden lg:flex items-center gap-1 rounded-full border border-white/15 bg-black/60 px-2.5 py-2 backdrop-blur-2xl shadow-2xl shadow-black/40"
-                    >
-                        {/* Mini logo */}
-                        <Link href="/" className="mr-1">
-                            <LogoIcon size={32} className="transition-transform hover:rotate-6 hover:scale-110 drop-shadow-md" />
-                        </Link>
-
-                        {/* Divider */}
-                        <div className="h-5 w-px bg-white/10 mx-1" />
-
-                        {/* Nav links (subset) */}
-                        {pillLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                href={link.href}
-                                className="rounded-full px-3.5 py-1.5 text-xs font-medium text-white/70 transition-all duration-200 hover:text-white hover:bg-white/10"
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
-
-                        {/* Divider */}
-                        <div className="h-5 w-px bg-white/10 mx-1" />
-
-                        {/* CTA */}
-                        <Link
-                            href="/contact"
-                            className="rounded-full bg-brand-orange px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-brand-orange/30 transition-colors hover:bg-brand-orange-dark"
-                        >
-                            Get Started
-                        </Link>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* ════════════════════════════════════════════════════
-             * COLLAPSED: MOBILE FLOATING BAR
-             * ════════════════════════════════════════════════════ */}
-            <AnimatePresence>
-                {showPill && !isMobileOpen && (
-                    <motion.div
-                        key="pill-nav-mobile"
-                        initial={{ y: -50, opacity: 0, scale: 0.9 }}
-                        animate={{ y: 0, opacity: 1, scale: 1 }}
-                        exit={{ y: -30, opacity: 0, scale: 0.9 }}
-                        transition={{
-                            type: "spring",
-                            stiffness: 200,
-                            damping: 24,
-                            mass: 0.6,
-                        }}
-                        className="fixed top-3 left-3 right-3 z-50 flex lg:hidden items-center justify-between rounded-2xl border border-white/15 bg-black/60 px-4 py-2.5 backdrop-blur-2xl shadow-2xl shadow-black/40"
-                    >
-                        {/* Mini logo + brand */}
-                        <Link href="/" className="flex items-center gap-2">
-                            <LogoIcon size={28} className="transition-transform hover:rotate-6 hover:scale-110 drop-shadow-md" />
-                            <span className="text-sm font-bold font-[family-name:var(--font-heading)]">
-                                <span className="text-white">Orange</span>
-                                <span className="text-brand-orange-light">Studies</span>
-                            </span>
-                        </Link>
-
-                        {/* Right side: CTA + Hamburger */}
-                        <div className="flex items-center gap-2">
-                            <Link
-                                href="/contact"
-                                className="rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-md shadow-brand-orange/30"
-                            >
-                                Get Started
-                            </Link>
-                            <button
-                                onClick={() => setIsMobileOpen(true)}
-                                className="rounded-lg p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-white/70 transition-colors hover:bg-white/10 hover:text-white"
-                                aria-label="Open menu"
-                            >
-                                <Menu size={20} />
-                            </button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* ════════════════════════════════════════════════════
+            {/* ═══════════════════════════════════════════
              * MOBILE FULLSCREEN OVERLAY MENU
-             * ════════════════════════════════════════════════════ */}
+             * ═══════════════════════════════════════════ */}
             <AnimatePresence>
                 {isMobileOpen && (
                     <motion.div
