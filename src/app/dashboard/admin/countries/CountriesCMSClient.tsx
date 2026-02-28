@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Globe, Plus, Pencil, Trash2, Loader2, X, Search } from "lucide-react";
 import AdminCMSLayout from "@/components/admin/AdminCMSLayout";
-import { upsertCountry, deleteCountry } from "@/app/actions/cms";
+import { upsertCountry, deleteCountry, seedDefaultCountries } from "@/app/actions/cms";
 
 interface Country {
     id: string; name: string; code: string; flag: string; slug: string;
@@ -21,6 +21,8 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
     const [loading, setLoading] = useState(false);
     const [deleting, setDeleting] = useState<string | null>(null);
     const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+    const [isSeeding, startSeedTransition] = useTransition();
+    const [seedMsg, setSeedMsg] = useState<string | null>(null);
 
     const filtered = countries.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.code.toLowerCase().includes(search.toLowerCase()));
 
@@ -58,10 +60,32 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
                     <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search countries..."
                         className="w-full rounded-xl border border-neutral-200 bg-white pl-10 pr-4 py-2.5 text-sm text-neutral-800 focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
                 </div>
-                <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:shadow-md hover:scale-105">
-                    <Plus className="h-4 w-4" /> Add Country
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => {
+                            setSeedMsg(null);
+                            startSeedTransition(async () => {
+                                const res = await seedDefaultCountries();
+                                if (res.success) setSeedMsg(`✅ Seeded ${res.count} countries!`);
+                                else setSeedMsg(`❌ ${res.error}`);
+                            });
+                        }}
+                        disabled={isSeeding}
+                        className="inline-flex items-center gap-2 rounded-xl border border-brand-purple px-5 py-2.5 text-sm font-bold text-brand-purple shadow-sm transition-all hover:bg-brand-purple/5 hover:shadow-md disabled:opacity-50"
+                    >
+                        {isSeeding ? <><Loader2 className="h-4 w-4 animate-spin" /> Seeding...</> : <><Globe className="h-4 w-4" /> Seed Defaults</>}
+                    </button>
+                    <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:shadow-md hover:scale-105">
+                        <Plus className="h-4 w-4" /> Add Country
+                    </button>
+                </div>
             </div>
+
+            {seedMsg && (
+                <div className={`rounded-xl px-4 py-3 text-sm font-medium ${seedMsg.startsWith("✅") ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-600 border border-red-200"}`}>
+                    {seedMsg}
+                </div>
+            )}
 
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div className="overflow-x-auto w-full">

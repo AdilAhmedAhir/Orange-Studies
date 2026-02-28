@@ -265,3 +265,73 @@ export async function deleteProgram(id: string): Promise<{ success: boolean; err
         return { success: false, error: msg };
     }
 }
+
+/* ═══════════════════════════════════════════════════════
+   COUNTRY SEEDING — 1-click population
+   ═══════════════════════════════════════════════════════ */
+const DEFAULT_COUNTRIES = [
+    {
+        name: "United Kingdom",
+        code: "GB",
+        flag: "🇬🇧",
+        slug: "united-kingdom",
+        description: "Home to world-renowned universities like Oxford and Cambridge, the UK offers a rich academic tradition, diverse cultural experiences, and globally recognized qualifications. With programs typically shorter than other countries, students benefit from excellent value and strong post-study work opportunities.",
+        image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&q=80&w=2000",
+    },
+    {
+        name: "Australia",
+        code: "AU",
+        flag: "🇦🇺",
+        slug: "australia",
+        description: "Australia combines world-class education with an unbeatable lifestyle. With 7 of the world's top 100 universities, stunning natural landscapes, and generous post-study work visas, Australia is one of the most popular destinations for international students seeking quality education and adventure.",
+        image: "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?auto=format&fit=crop&q=80&w=2000",
+    },
+    {
+        name: "Canada",
+        code: "CA",
+        flag: "🇨🇦",
+        slug: "canada",
+        description: "Canada is celebrated for its inclusive multicultural society, affordable tuition, and welcoming immigration policies. Canadian degrees are recognized worldwide, and graduates benefit from excellent pathways to permanent residency, making it an ideal destination for long-term career planning.",
+        image: "https://images.unsplash.com/photo-1517935706615-2717063c2225?auto=format&fit=crop&q=80&w=2000",
+    },
+    {
+        name: "Germany",
+        code: "DE",
+        flag: "🇩🇪",
+        slug: "germany",
+        description: "Germany offers tuition-free education at many public universities, making it one of the most affordable study destinations in Europe. Known for engineering and technology excellence, Germany provides strong industry connections, cutting-edge research facilities, and a vibrant international student community.",
+        image: "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&q=80&w=2000",
+    },
+    {
+        name: "United States",
+        code: "US",
+        flag: "🇺🇸",
+        slug: "united-states",
+        description: "The United States hosts the largest number of international students worldwide, with unparalleled academic diversity and research opportunities. From Ivy League institutions to innovative tech hubs, American universities offer flexible curricula, cutting-edge facilities, and extensive scholarship programs.",
+        image: "https://images.unsplash.com/photo-1485738422979-f5c462d49f04?auto=format&fit=crop&q=80&w=2000",
+    },
+];
+
+export async function seedDefaultCountries(): Promise<{ success: boolean; count: number; error?: string }> {
+    try {
+        const admin = await requireAdmin();
+        if (!admin) return { success: false, count: 0, error: "Unauthorized." };
+
+        let count = 0;
+        for (const c of DEFAULT_COUNTRIES) {
+            await prisma.country.upsert({
+                where: { slug: c.slug },
+                update: {},            // Don't overwrite if already customized
+                create: c,
+            });
+            count++;
+        }
+
+        revalidatePath("/", "layout");
+        revalidateCMS();
+        return { success: true, count };
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Seeding failed.";
+        return { success: false, count: 0, error: msg };
+    }
+}
