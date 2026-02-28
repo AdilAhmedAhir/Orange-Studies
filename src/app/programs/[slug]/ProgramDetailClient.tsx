@@ -41,7 +41,7 @@ interface ProgramDetailProps {
         logoPlaceholder: string;
         colorAccent: string;
         description: string;
-        country: { name: string; code: string; flag: string };
+        country: { name: string; code: string; flag: string; slug: string };
     };
 }
 
@@ -99,7 +99,7 @@ export default function ProgramDetailClient({ course, university }: ProgramDetai
                                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-xs font-black text-white">{university.logoPlaceholder}</span>
                                 <span className="text-sm font-medium">{university.name}</span>
                                 <span className="text-sm text-white/50">•</span>
-                                <span className="text-sm text-white/60">{university.country.flag} {university.location}</span>
+                                <span className="text-sm text-white/60"><Link href={`/study-abroad/country-guides/${university.country.slug}`} className="hover:underline hover:text-brand-orange transition-colors">{university.country.flag} {university.location}</Link></span>
                             </Link>
                         </motion.div>
 

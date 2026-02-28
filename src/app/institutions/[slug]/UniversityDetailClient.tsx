@@ -32,7 +32,7 @@ interface UniProps {
         accommodationInfo: string;
         colorAccent: string;
         tags: string[];
-        country: { name: string; code: string; flag: string };
+        country: { name: string; code: string; flag: string; slug: string };
         courses: Array<{
             id: string;
             slug: string;
@@ -88,7 +88,7 @@ export default function UniversityDetailClient({ uni }: UniProps) {
                                 {uni.name}
                             </motion.h1>
                             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex flex-wrap gap-3">
-                                <span className="flex items-center gap-1.5 text-sm text-white/80"><MapPin className="h-4 w-4" /> {uni.location}, {uni.country.flag} {uni.country.name}</span>
+                                <span className="flex items-center gap-1.5 text-sm text-white/80"><MapPin className="h-4 w-4" /> {uni.location}, <Link href={`/study-abroad/country-guides/${uni.country.slug}`} className="hover:underline hover:text-brand-orange transition-colors">{uni.country.flag} {uni.country.name}</Link></span>
                                 <span className="flex items-center gap-1.5 text-sm text-white/80"><Award className="h-4 w-4" /> World Rank #{uni.ranking}</span>
                                 <span className="flex items-center gap-1.5 text-sm text-white/80"><Clock className="h-4 w-4" /> Est. {uni.established}</span>
                             </motion.div>
@@ -118,7 +118,7 @@ export default function UniversityDetailClient({ uni }: UniProps) {
             </section>
 
             {/* ─── TAB NAV ─── */}
-            <section className="sticky top-16 z-30 bg-white/90 backdrop-blur-md border-b border-neutral-200/60">
+            <section className="sticky top-[72px] lg:top-[80px] z-40 bg-white border-b border-gray-200 w-full">
                 <div className="mx-auto flex max-w-6xl gap-0 px-6">
                     {tabs.map((tab) => (
                         <button key={tab} onClick={() => setActiveTab(tab)}

@@ -11,7 +11,12 @@ export default async function UniversityDetailPage({ params }: { params: Promise
     // Serialize for client component
     const uni = {
         ...university,
-        country: university.country,
+        country: {
+            name: university.country.name,
+            code: university.country.code,
+            flag: university.country.flag,
+            slug: university.country.slug || "",
+        },
         courses: university.programs,
         tuitionRange: {
             min: university.tuitionMin,

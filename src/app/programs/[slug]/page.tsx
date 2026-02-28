@@ -37,7 +37,12 @@ export default async function ProgramDetailPage({ params }: { params: Promise<{ 
         logoPlaceholder: program.university.logoPlaceholder,
         colorAccent: program.university.colorAccent,
         description: program.university.description,
-        country: program.university.country,
+        country: {
+            name: program.university.country.name,
+            code: program.university.country.code,
+            flag: program.university.country.flag,
+            slug: program.university.country.slug || "",
+        },
     };
 
     return <ProgramDetailClient course={course} university={university} />;

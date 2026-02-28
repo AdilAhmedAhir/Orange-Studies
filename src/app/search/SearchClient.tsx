@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useTransition } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -72,6 +72,7 @@ const filterGroups = [
 function SearchContent({ courses }: { courses: CourseItem[] }) {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const [isPending, startTransition] = useTransition();
 
     const activeCountry = searchParams.get("country") || "";
     const activeLevel = searchParams.get("level") || "";
@@ -85,17 +86,21 @@ function SearchContent({ courses }: { courses: CourseItem[] }) {
         } else {
             params.set(key, value);
         }
-        router.push(`/search?${params.toString()}`, { scroll: false });
+        startTransition(() => {
+            router.push(`/search?${params.toString()}`, { scroll: false });
+        });
     };
 
     const setQuery = (value: string) => {
         const params = new URLSearchParams(searchParams.toString());
         if (value) params.set("q", value);
         else params.delete("q");
-        router.push(`/search?${params.toString()}`, { scroll: false });
+        startTransition(() => {
+            router.push(`/search?${params.toString()}`, { scroll: false });
+        });
     };
 
-    const clearAll = () => router.push("/search", { scroll: false });
+    const clearAll = () => startTransition(() => router.push("/search", { scroll: false }));
 
     const activeValues: Record<string, string> = { country: activeCountry, level: activeLevel, discipline: activeDiscipline };
     const activeCount = [activeCountry, activeLevel, activeDiscipline, query].filter(Boolean).length;
@@ -124,7 +129,7 @@ function SearchContent({ courses }: { courses: CourseItem[] }) {
     return (
         <div className="min-h-screen bg-[#F9FAFB]">
             {/* Hero Bar */}
-            <div className="bg-gradient-to-r from-brand-purple via-brand-deep to-brand-purple py-12 px-6">
+            <div className="bg-gradient-to-r from-brand-purple via-brand-deep to-brand-purple pt-28 lg:pt-32 pb-12 px-6">
                 <div className="mx-auto max-w-7xl">
                     <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                         className="text-3xl font-bold text-white font-[family-name:var(--font-heading)] sm:text-4xl">
@@ -209,7 +214,7 @@ function SearchContent({ courses }: { courses: CourseItem[] }) {
                                 </button>
                             </motion.div>
                         ) : (
-                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                            <div className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-2 transition-opacity ${isPending ? "opacity-50 pointer-events-none" : ""}`}>
                                 <AnimatePresence mode="popLayout">
                                     {filtered.map((course, i) => (
                                         <motion.div

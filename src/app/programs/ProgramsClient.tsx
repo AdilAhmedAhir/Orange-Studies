@@ -73,7 +73,7 @@ export default function ProgramsClient({ programs, disciplines, activeDiscipline
                     <div className="absolute bottom-10 right-20 h-64 w-64 rounded-full bg-brand-purple/20 blur-[100px]" />
                     <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
                 </div>
-                <div className="relative z-10 mx-auto max-w-4xl px-6 py-32 text-center">
+                <div className="relative z-10 mx-auto max-w-4xl px-6 pt-28 lg:pt-32 pb-16 text-center">
                     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
                         <span className="inline-flex items-center gap-2 rounded-full border border-brand-orange/30 bg-brand-orange/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-brand-orange-light mb-6">
                             <GraduationCap className="h-3.5 w-3.5" /> Explore Programs
