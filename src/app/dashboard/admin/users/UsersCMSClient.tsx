@@ -118,7 +118,7 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                 </div>
                 {isAdmin && (
                     <button onClick={() => { setModal(true); setMsg(null); setGeneratedPassword(null); }}
-                        className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:shadow-md hover:scale-105">
+                        className="inline-flex items-center gap-2 rounded-xl bg-brand-purple px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:shadow-md hover:scale-105">
                         <Plus className="h-4 w-4" /> Add Staff
                     </button>
                 )}
@@ -127,13 +127,13 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
             {/* ─── Data Table ─── */}
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div className="overflow-x-auto w-full">
-                    <table className="w-full min-w-[700px] text-left text-sm">
+                    <table className="w-full md:min-w-[700px] text-left text-sm">
                         <thead>
                             <tr>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">User</th>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Role</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Applications</th>
-                                <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Joined</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Applications</th>
+                                <th className="hidden md:table-cell px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Joined</th>
                                 {isAdmin && <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50 text-right">Actions</th>}
                             </tr>
                         </thead>
@@ -179,8 +179,8 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4"><span className="font-semibold text-neutral-800">{u.applicationCount}</span></td>
-                                        <td className="px-6 py-4 text-xs text-neutral-500">{u.joinedDate}</td>
+                                        <td className="hidden md:table-cell px-6 py-4"><span className="font-semibold text-neutral-800">{u.applicationCount}</span></td>
+                                        <td className="hidden md:table-cell px-6 py-4 text-xs text-neutral-500">{u.joinedDate}</td>
                                         {isAdmin && (
                                             <td className="px-6 py-4 text-right">
                                                 {!isSelf && (

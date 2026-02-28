@@ -69,14 +69,14 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
                     <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search programs..."
                         className="w-full rounded-xl border border-neutral-200 bg-white pl-10 pr-4 py-2.5 text-sm text-neutral-800 focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
                 </div>
-                <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-xl bg-brand-orange px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:shadow-md hover:scale-105">
+                <button onClick={openCreate} className="inline-flex items-center gap-2 rounded-xl bg-brand-purple px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:shadow-md hover:scale-105">
                     <Plus className="h-4 w-4" /> Add Program
                 </button>
             </div>
 
             <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                 <div className="overflow-x-auto w-full">
-                    <table className="w-full min-w-[800px] text-left text-sm">
+                    <table className="w-full md:min-w-[800px] text-left text-sm">
                         <thead>
                             <tr>
                                 <th className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Program</th>
@@ -97,14 +97,14 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
                                                 <GraduationCap className="h-4 w-4 text-brand-orange" />
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-neutral-800 max-w-[200px] truncate">{p.title}</p>
+                                                <p className="font-semibold text-neutral-800 max-w-[250px] truncate">{p.title}</p>
                                                 <p className="text-xs text-neutral-400">{p.duration} • {p.studyMode}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-neutral-600 max-w-[150px] truncate">{p.universityName}</td>
+                                    <td className="px-6 py-4 text-neutral-600 max-w-[200px] truncate">{p.universityName}</td>
                                     <td className="hidden md:table-cell px-6 py-4"><span className="rounded-full bg-brand-purple/10 px-2.5 py-0.5 text-xs font-bold text-brand-purple">{p.level}</span></td>
-                                    <td className="hidden md:table-cell px-6 py-4 text-xs text-neutral-500 max-w-[120px] truncate">{p.discipline || "—"}</td>
+                                    <td className="hidden md:table-cell px-6 py-4 text-xs text-neutral-500 max-w-[160px] truncate">{p.discipline || "—"}</td>
                                     <td className="hidden md:table-cell px-6 py-4 text-xs text-neutral-500">{p.currency} {p.tuitionFee.toLocaleString()}</td>
                                     <td className="hidden md:table-cell px-6 py-4"><span className="font-semibold text-neutral-800">{p.applicationCount}</span></td>
                                     <td className="px-6 py-4 text-right">
