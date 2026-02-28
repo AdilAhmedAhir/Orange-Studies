@@ -1,12 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useTransition } from "react";
 import {
     Search, Filter, GraduationCap, MapPin, Clock, DollarSign,
     Star, ArrowRight, X,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CTABanner } from "@/components/home/CTABanner";
 import { Footer } from "@/components/home/Footer";
 
@@ -42,6 +43,8 @@ export default function ProgramsClient({ programs, disciplines, activeDiscipline
     const [search, setSearch] = useState("");
     const [level, setLevel] = useState("All");
     const [showFilters, setShowFilters] = useState(false);
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
 
     const filtered = useMemo(() => {
         return programs.filter((p) => {
@@ -140,11 +143,13 @@ export default function ProgramsClient({ programs, disciplines, activeDiscipline
                                     value={activeDiscipline ?? "All"}
                                     onChange={(e) => {
                                         const val = e.target.value;
-                                        if (val === "All") {
-                                            window.location.href = "/programs";
-                                        } else {
-                                            window.location.href = `/programs?discipline=${encodeURIComponent(val)}`;
-                                        }
+                                        startTransition(() => {
+                                            if (val === "All") {
+                                                router.push("/programs");
+                                            } else {
+                                                router.push(`/programs?discipline=${encodeURIComponent(val)}`);
+                                            }
+                                        });
                                     }}
                                     className="w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm outline-none transition-all focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
                                 >
