@@ -154,14 +154,14 @@ export default function AdminDashboardClient({
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.06 }}
-                            className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
+                            className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow"
                         >
                             <div className="flex items-center justify-between">
                                 <div className={`flex h-11 w-11 items-center justify-center rounded-full ${stat.bg} ring-4 ${stat.ring}`}>
                                     <stat.icon className={`h-5 w-5 ${stat.color}`} />
                                 </div>
                             </div>
-                            <p className="mt-4 text-2xl font-bold text-gray-900 font-[family-name:var(--font-heading)]">{stat.value}</p>
+                            <p className="mt-3 sm:mt-4 text-2xl font-bold text-gray-900 font-[family-name:var(--font-heading)]">{stat.value}</p>
                             <p className="text-xs font-medium text-gray-500 mt-0.5">{stat.label}</p>
                         </motion.div>
                     ))}
@@ -186,7 +186,7 @@ export default function AdminDashboardClient({
                                                 <StatusBadge status={item.status} />
                                                 <span className="text-sm font-bold text-gray-700">{item.count}</span>
                                             </div>
-                                            <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                                            <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
                                                 <motion.div
                                                     className="h-full rounded-full bg-gradient-to-r from-brand-orange to-brand-purple"
                                                     initial={{ width: 0 }}
@@ -213,13 +213,13 @@ export default function AdminDashboardClient({
 
                         {recentApplications.length > 0 ? (
                             <div className="overflow-x-auto w-full">
-                                <table className="w-full min-w-[700px] text-sm">
+                                <table className="w-full md:min-w-[700px] text-sm">
                                     <thead>
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Student</th>
                                             <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Program</th>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Status</th>
-                                            <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Date</th>
+                                            <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Status</th>
+                                            <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Date</th>
                                             <th className="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Action</th>
                                         </tr>
                                     </thead>
@@ -240,10 +240,10 @@ export default function AdminDashboardClient({
                                                     <p className="text-gray-700 max-w-[200px] truncate">{app.program}</p>
                                                     <p className="text-xs text-gray-400 max-w-[200px] truncate">{app.university}</p>
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className="hidden md:table-cell px-6 py-4">
                                                     <StatusBadge status={app.status} />
                                                 </td>
-                                                <td className="px-6 py-4 text-xs text-gray-400 whitespace-nowrap">{app.date}</td>
+                                                <td className="hidden md:table-cell px-6 py-4 text-xs text-gray-400 whitespace-nowrap">{app.date}</td>
                                                 <td className="px-6 py-4 text-right">
                                                     <Link href={`/dashboard/admin/application/${app.appId}`}
                                                         className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition-all hover:bg-brand-purple hover:text-white hover:border-brand-purple">
@@ -274,14 +274,14 @@ export default function AdminDashboardClient({
 
                     {recentLeads.length > 0 ? (
                         <div className="overflow-x-auto w-full">
-                            <table className="w-full min-w-[700px] text-sm">
+                            <table className="w-full md:min-w-[700px] text-sm">
                                 <thead>
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Name</th>
-                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Email</th>
+                                        <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Email</th>
                                         <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Type</th>
                                         <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Status</th>
-                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Date</th>
+                                        <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 bg-gray-50">Date</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
@@ -300,14 +300,14 @@ export default function AdminDashboardClient({
                                                 className="hover:bg-gray-50 transition-colors"
                                             >
                                                 <td className="px-6 py-4 font-semibold text-gray-800">{lead.name}</td>
-                                                <td className="px-6 py-4 text-gray-500">{lead.email}</td>
+                                                <td className="hidden md:table-cell px-6 py-4 text-gray-500">{lead.email}</td>
                                                 <td className="px-6 py-4">
                                                     <StatusBadge status={typeMap[lead.type] || lead.type} />
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <StatusBadge status={lead.status} />
                                                 </td>
-                                                <td className="px-6 py-4 text-xs text-gray-400 whitespace-nowrap">{lead.date}</td>
+                                                <td className="hidden md:table-cell px-6 py-4 text-xs text-gray-400 whitespace-nowrap">{lead.date}</td>
                                             </motion.tr>
                                         );
                                     })}
@@ -386,7 +386,7 @@ export default function AdminDashboardClient({
                                 <option>Full-time</option><option>Part-time</option><option>Both</option>
                             </select>
                             <textarea placeholder="Description" value={progForm.description} onChange={(e) => setProgForm({ ...progForm, description: e.target.value })} rows={3} className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm outline-none focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 resize-none" />
-                            <button type="submit" disabled={progLoading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange py-3 text-sm font-bold text-white shadow-lg shadow-brand-orange/20 transition-all hover:shadow-xl disabled:opacity-60">
+                            <button type="submit" disabled={progLoading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-purple py-3 text-sm font-bold text-white shadow-lg shadow-brand-purple/20 transition-all hover:shadow-xl disabled:opacity-60">
                                 {progLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Creating...</> : <><Plus className="h-4 w-4" /> Create Program</>}
                             </button>
                         </form>
