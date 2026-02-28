@@ -3,6 +3,7 @@ import { Outfit, Montserrat } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { WhatsAppFAB } from "@/components/layout/WhatsAppFAB";
+import AuthProvider from "@/components/providers/AuthProvider";
 
 const outfit = Outfit({
   variable: "--font-heading",
@@ -48,10 +49,13 @@ export default function RootLayout({
       <body
         className={`${outfit.variable} ${montserrat.variable} antialiased`}
       >
-        <Navbar />
-        <main>{children}</main>
-        <WhatsAppFAB />
+        <AuthProvider>
+          <Navbar />
+          <main>{children}</main>
+          <WhatsAppFAB />
+        </AuthProvider>
       </body>
     </html>
   );
 }
+
