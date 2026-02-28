@@ -310,6 +310,14 @@ const DEFAULT_COUNTRIES = [
         description: "The United States hosts the largest number of international students worldwide, with unparalleled academic diversity and research opportunities. From Ivy League institutions to innovative tech hubs, American universities offer flexible curricula, cutting-edge facilities, and extensive scholarship programs.",
         image: "https://images.unsplash.com/photo-1485738422979-f5c462d49f04?auto=format&fit=crop&q=80&w=2000",
     },
+    {
+        name: "Malaysia",
+        code: "MY",
+        flag: "🇲🇾",
+        slug: "malaysia",
+        description: "Malaysia offers affordable world-class education in a vibrant multicultural setting. With English-medium programs, low living costs, and a strategic location in Southeast Asia, Malaysia is an increasingly popular destination for international students seeking quality education at exceptional value.",
+        image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&q=80&w=2000",
+    },
 ];
 
 export async function seedDefaultCountries(): Promise<{ success: boolean; count: number; error?: string }> {
