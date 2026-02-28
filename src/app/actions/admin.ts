@@ -323,6 +323,14 @@ export async function reuploadDocument(
         const doc = await prisma.document.findUnique({ where: { id: docId } });
         if (!doc) return { success: false, error: "Document not found." };
 
+        // Ownership check: students can only re-upload their own documents
+        const currentUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+        if (!currentUser) return { success: false, error: "User not found." };
+
+        if (currentUser.role === "STUDENT" && doc.userId !== currentUser.id) {
+            return { success: false, error: "You do not have permission to modify this document." };
+        }
+
         await prisma.document.update({
             where: { id: docId },
             data: {

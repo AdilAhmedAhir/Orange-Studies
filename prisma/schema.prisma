@@ -133,7 +133,8 @@ model Application {
   programId String
   program   Program @relation(fields: [programId], references: [id])
 
-  timeline TimelineStep[]
+  timeline  TimelineStep[]
+  documents Document[]
   auditLogs AuditLog[]
 
   @@index([userId])
@@ -175,7 +176,11 @@ model Document {
   userId String
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
   @@index([userId])
+  @@index([applicationId])
 }
 
 // ─── Audit Logs ──────────────────────────────────────

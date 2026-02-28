@@ -3,6 +3,7 @@
 import { put } from "@vercel/blob";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { randomUUID } from "crypto";
 
 export async function uploadFile(formData: FormData): Promise<{ url: string }> {
     const session = await getServerSession(authOptions);
@@ -35,9 +36,12 @@ export async function uploadFile(formData: FormData): Promise<{ url: string }> {
         throw new Error("Invalid file type. Accepted: PDF, JPG, PNG, WebP, DOC, DOCX.");
     }
 
-    const uniqueName = `documents/${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
+    // Sanitize: extract extension, strip non-alphanumeric, generate UUID filename
+    const ext = file.name.split(".").pop()?.replace(/[^a-zA-Z0-9]/g, "") || "pdf";
+    const uniqueName = `documents/${randomUUID()}.${ext}`;
 
     const blob = await put(uniqueName, file, { access: "public" });
 
     return { url: blob.url };
 }
+
