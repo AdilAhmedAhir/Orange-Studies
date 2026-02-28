@@ -29,6 +29,15 @@ export async function registerUser(
         return { error: "An account with this email already exists." };
     }
 
+    // Rate limiting: block rapid-fire registrations from the same IP/email pattern
+    const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const recentRegistrations = await prisma.user.count({
+        where: { createdAt: { gte: fiveMinsAgo } },
+    });
+    if (recentRegistrations >= 10) {
+        return { error: "Too many registrations. Please try again later." };
+    }
+
     const hashedPassword = await hash(data.password, 10);
 
     await prisma.user.create({

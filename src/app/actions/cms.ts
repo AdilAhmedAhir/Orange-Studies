@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { randomBytes } from "crypto";
 
 /* ── Helper: auth gate ── */
 async function requireAdmin() {
@@ -47,24 +48,29 @@ export async function upsertCountry(data: CountryPayload): Promise<{ success: bo
         if (!data.name || !data.code || !data.flag) return { success: false, error: "Name, code, and flag are required." };
 
         if (data.id) {
+            // Preserve existing slug on update for SEO
             await prisma.country.update({
                 where: { id: data.id },
                 data: {
                     name: data.name.trim(),
                     code: data.code.trim().toUpperCase(),
                     flag: data.flag.trim(),
-                    slug: slugify(data.name),
                     description: data.description || null,
                     image: data.image || null,
                 },
             });
         } else {
+            // Collision-safe slug
+            let slug = slugify(data.name);
+            const existing = await prisma.country.findUnique({ where: { slug } });
+            if (existing) slug += `-${randomBytes(2).toString("hex")}`;
+
             await prisma.country.create({
                 data: {
                     name: data.name.trim(),
                     code: data.code.trim().toUpperCase(),
                     flag: data.flag.trim(),
-                    slug: slugify(data.name),
+                    slug,
                     description: data.description || null,
                     image: data.image || null,
                 },
@@ -148,8 +154,14 @@ export async function upsertUniversity(data: UniversityPayload): Promise<{ succe
         };
 
         if (data.id) {
-            await prisma.university.update({ where: { id: data.id }, data: payload });
+            // Preserve existing slug on update for SEO
+            const { slug: _unused, ...updatePayload } = payload;
+            void _unused;
+            await prisma.university.update({ where: { id: data.id }, data: updatePayload });
         } else {
+            // Collision-safe slug
+            const existingSlug = await prisma.university.findUnique({ where: { slug: payload.slug } });
+            if (existingSlug) payload.slug += `-${randomBytes(2).toString("hex")}`;
             await prisma.university.create({ data: payload });
         }
         revalidateCMS();
@@ -220,8 +232,14 @@ export async function upsertProgram(data: ProgramPayload): Promise<{ success: bo
         };
 
         if (data.id) {
-            await prisma.program.update({ where: { id: data.id }, data: payload });
+            // Preserve existing slug on update for SEO
+            const { slug: _unused, ...updatePayload } = payload;
+            void _unused;
+            await prisma.program.update({ where: { id: data.id }, data: updatePayload });
         } else {
+            // Collision-safe slug
+            const existingSlug = await prisma.program.findUnique({ where: { slug: payload.slug } });
+            if (existingSlug) payload.slug += `-${randomBytes(2).toString("hex")}`;
             await prisma.program.create({ data: payload });
         }
         revalidateCMS();

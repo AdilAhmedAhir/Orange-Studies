@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { randomBytes } from "crypto";
 
 interface DocumentUrls {
     passportUrl?: string;
@@ -47,11 +48,14 @@ export async function submitApplication(programId: string, documentUrls: Documen
     }
 
     // Atomic transaction: application + timeline + documents
+    const refCode = `OS-${new Date().getFullYear()}-${randomBytes(3).toString("hex").toUpperCase()}`;
+
     const application = await prisma.$transaction(async (tx) => {
         const app = await tx.application.create({
             data: {
                 userId: user.id,
                 programId,
+                refCode,
                 status: "SUBMITTED",
                 progress: 15,
                 timeline: {

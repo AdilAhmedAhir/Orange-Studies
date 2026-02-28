@@ -20,15 +20,27 @@ export async function submitLead(
         return { success: false, error: "Name, email, and type are required." };
     }
 
+    // Rate limiting: 5-minute cooldown per email
+    const fiveMinsAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const recent = await prisma.lead.findFirst({
+        where: { email: payload.email.toLowerCase().trim(), createdAt: { gte: fiveMinsAgo } },
+    });
+    if (recent) {
+        return { success: false, error: "Please wait before submitting again." };
+    }
+
+    // Sanitize message length
+    const safeMessage = payload.message ? payload.message.substring(0, 2000) : null;
+
     await prisma.lead.create({
         data: {
-            name: payload.name,
-            email: payload.email,
+            name: payload.name.trim(),
+            email: payload.email.toLowerCase().trim(),
             phone: payload.phone || null,
             type: payload.type,
             branch: payload.branch || null,
             date: payload.date || null,
-            message: payload.message || null,
+            message: safeMessage,
         },
     });
 
@@ -36,3 +48,4 @@ export async function submitLead(
 
     return { success: true };
 }
+

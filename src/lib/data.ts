@@ -16,6 +16,7 @@ export async function getAllUniversities() {
     return prisma.university.findMany({
         include: { country: true, programs: true },
         orderBy: { ranking: "asc" },
+        take: 50,
     });
 }
 
@@ -40,6 +41,7 @@ export async function getAllPrograms() {
             },
         },
         orderBy: { title: "asc" },
+        take: 50,
     });
 }
 
@@ -78,6 +80,7 @@ export async function searchPrograms(filters: {
             },
         },
         orderBy: { title: "asc" },
+        take: 50,
     });
 }
 
@@ -97,6 +100,7 @@ export async function getAllProgramsForBrowse(discipline?: string) {
             },
         },
         orderBy: { title: "asc" },
+        take: 50,
     });
 }
 

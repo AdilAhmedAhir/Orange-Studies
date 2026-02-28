@@ -58,6 +58,22 @@ export async function updateApplicationStatus(
 
     const oldStatus = app.status;
 
+    // State machine: enforce valid transitions
+    const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+        SUBMITTED: ["UNDER_REVIEW", "REJECTED"],
+        UNDER_REVIEW: ["OFFER_RECEIVED", "REJECTED"],
+        OFFER_RECEIVED: ["OFFER_ACCEPTED", "VISA_PROCESSING", "REJECTED"],
+        OFFER_ACCEPTED: ["VISA_PROCESSING", "REJECTED"],
+        VISA_PROCESSING: ["ENROLLED", "REJECTED"],
+        REJECTED: ["SUBMITTED"],
+        ENROLLED: [],
+    };
+
+    const allowed = ALLOWED_TRANSITIONS[oldStatus];
+    if (!allowed || !allowed.includes(newStatus)) {
+        return { success: false, error: `Invalid transition from ${oldStatus} to ${newStatus}.` };
+    }
+
     await prisma.application.update({
         where: { id: applicationId },
         data: {
