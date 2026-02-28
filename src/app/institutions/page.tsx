@@ -7,6 +7,8 @@ import {
 import { CTABanner } from "@/components/home/CTABanner";
 import { Footer } from "@/components/home/Footer";
 
+export const revalidate = 3600;
+
 const servicesOffered = [
     { title: "Student Recruitment", description: "We source, screen, and refer quality international students to your programs, ensuring they meet your admission criteria.", icon: Users, color: "from-brand-orange to-amber-400" },
     { title: "Regional Representation", description: "Act as your official representative in South Asia, East Asia, and the Middle East — managing inquiries and applications.", icon: Globe, color: "from-blue-500 to-indigo-500" },

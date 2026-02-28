@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { getUniversityBySlug } from "@/lib/data";
 import UniversityDetailClient from "./UniversityDetailClient";
 
+export const revalidate = 3600;
+
 export default async function UniversityDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
     const university = await getUniversityBySlug(slug);

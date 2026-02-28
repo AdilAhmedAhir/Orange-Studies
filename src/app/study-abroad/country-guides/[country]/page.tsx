@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { CTABanner } from "@/components/home/CTABanner";
 import { Footer } from "@/components/home/Footer";
+
+export const revalidate = 3600;
 import {
     ArrowLeft,
     GraduationCap,

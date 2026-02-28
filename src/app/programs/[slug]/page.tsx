@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { getProgramBySlug } from "@/lib/data";
 import ProgramDetailClient from "./ProgramDetailClient";
 
+export const revalidate = 3600;
+
 export default async function ProgramDetailPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
     const program = await getProgramBySlug(slug);
