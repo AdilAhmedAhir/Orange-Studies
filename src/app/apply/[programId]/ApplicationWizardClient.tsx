@@ -176,9 +176,9 @@ export default function ApplicationWizardClient({
                                         </h3>
                                         <div className="mt-4 grid gap-4 sm:grid-cols-2">
                                             {[
-                                                { key: "firstName", label: "First Name", placeholder: "Adil", icon: User },
-                                                { key: "lastName", label: "Last Name", placeholder: "Ahmed", icon: User },
-                                                { key: "email", label: "Email Address", placeholder: "adil@example.com", icon: Mail, type: "email" },
+                                                { key: "firstName", label: "First Name", placeholder: "e.g., Jane", icon: User },
+                                                { key: "lastName", label: "Last Name", placeholder: "e.g., Doe", icon: User },
+                                                { key: "email", label: "Email Address", placeholder: "jane@example.com", icon: Mail, type: "email" },
                                                 { key: "phone", label: "Phone Number", placeholder: "+880 1700-000000", icon: Phone, type: "tel" },
                                                 { key: "dob", label: "Date of Birth", placeholder: "", icon: Calendar, type: "date" },
                                                 { key: "nationality", label: "Nationality", placeholder: "Bangladeshi", icon: MapPin },

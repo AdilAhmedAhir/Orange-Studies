@@ -9,7 +9,7 @@ interface RegisterPayload {
     fullName: string;
     email: string;
     password: string;
-    phone?: string;
+    phone: string;
 }
 
 export async function registerUser(
@@ -17,6 +17,10 @@ export async function registerUser(
 ): Promise<{ success?: boolean; error?: string; requiresVerification?: boolean; email?: string }> {
     if (!data.fullName || !data.email || !data.password) {
         return { error: "Name, email, and password are required." };
+    }
+
+    if (!data.phone || data.phone.trim() === "") {
+        return { error: "Phone number is required." };
     }
 
     if (data.password.length < 6) {

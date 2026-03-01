@@ -65,7 +65,7 @@ function LoginForm() {
                 fullName: form.fullName,
                 email: form.email,
                 password: form.password,
-                phone: form.phone || undefined,
+                phone: form.phone,
             });
 
             if (regRes.error) {
@@ -180,7 +180,7 @@ function LoginForm() {
                                             type="text"
                                             value={form.fullName}
                                             onChange={(e) => updateForm("fullName", e.target.value)}
-                                            placeholder="Adil Ahmed"
+                                            placeholder="e.g., Jane Doe"
                                             className="w-full rounded-xl border border-neutral-200 bg-neutral-50 py-3 pl-10 pr-4 text-sm text-neutral-800 placeholder:text-neutral-300 transition-all focus:border-brand-purple focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20"
                                         />
                                     </div>
@@ -205,7 +205,7 @@ function LoginForm() {
                             {/* Phone — sign up only */}
                             {!isLogin && (
                                 <div>
-                                    <label className="mb-1.5 block text-xs font-semibold text-neutral-600">Phone Number</label>
+                                    <label className="mb-1.5 block text-xs font-semibold text-neutral-600">Phone Number <span className="text-red-500">*</span></label>
                                     <div className="relative">
                                         <Phone className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-300" />
                                         <input
@@ -213,6 +213,7 @@ function LoginForm() {
                                             value={form.phone}
                                             onChange={(e) => updateForm("phone", e.target.value)}
                                             placeholder="+880 1700-000000"
+                                            required
                                             className="w-full rounded-xl border border-neutral-200 bg-neutral-50 py-3 pl-10 pr-4 text-sm text-neutral-800 placeholder:text-neutral-300 transition-all focus:border-brand-purple focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20"
                                         />
                                     </div>
