@@ -21,6 +21,7 @@ export default async function AdminSettingsPage() {
 
     return (
         <SettingsClient
+            adminEmail={session.user.email}
             initialSettings={{
                 smtpHost: settings.smtpHost || "",
                 smtpPort: settings.smtpPort || 465,

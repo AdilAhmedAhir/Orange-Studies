@@ -66,5 +66,13 @@ export async function registerUser(
         return { success: true, requiresVerification: true, email: normalizedEmail };
     }
 
+    // Send welcome email (non-blocking) when no verification needed
+    try {
+        const { sendWelcomeEmail } = await import("@/lib/mail");
+        await sendWelcomeEmail(normalizedEmail, data.fullName.trim());
+    } catch {
+        // non-blocking
+    }
+
     return { success: true };
 }

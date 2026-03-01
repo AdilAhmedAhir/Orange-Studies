@@ -99,5 +99,25 @@ export async function submitApplication(programId: string, documentUrls: Documen
     revalidatePath("/dashboard/student");
     revalidatePath("/dashboard/admin");
 
+    // Send application confirmation email (non-blocking)
+    try {
+        const { sendApplicationSubmittedEmail } = await import("@/lib/mail");
+        const programWithUni = await prisma.program.findUnique({
+            where: { id: programId },
+            include: { university: { select: { name: true } } },
+        });
+        if (programWithUni) {
+            await sendApplicationSubmittedEmail(
+                user.email,
+                user.fullName,
+                programWithUni.title,
+                programWithUni.university.name,
+                refCode
+            );
+        }
+    } catch (emailErr) {
+        console.error("[APP] Confirmation email failed (non-blocking):", emailErr);
+    }
+
     return { success: true, applicationId: application.id, refCode: application.refCode };
 }
