@@ -11,10 +11,21 @@ interface Uni {
     countryId: string; countryName: string; countryFlag: string; programCount: number;
     tuitionMin: number; tuitionMax: number; tuitionCurrency: string;
     established: number; description: string;
+    logoPlaceholder: string; totalStudents: number; internationalStudents: number;
+    acceptanceRate: number; detailedDescription: string; colorAccent: string;
+    highlights: string[]; facilities: string[]; campusLife: string;
+    admissionRequirements: string[]; accommodationInfo: string; tags: string[];
 }
 interface CountryOpt { id: string; name: string; flag: string; }
 
-const EMPTY = { name: "", location: "", countryId: "", ranking: "", description: "", established: "", tuitionMin: "", tuitionMax: "", tuitionCurrency: "GBP" };
+const EMPTY = {
+    name: "", location: "", countryId: "", ranking: "", description: "",
+    established: "", tuitionMin: "", tuitionMax: "", tuitionCurrency: "GBP",
+    logoPlaceholder: "", totalStudents: "", internationalStudents: "",
+    acceptanceRate: "", detailedDescription: "", colorAccent: "",
+    highlights: "", facilities: "", campusLife: "",
+    admissionRequirements: "", accommodationInfo: "", tags: "",
+};
 
 export default function UniversitiesCMSClient({ universities, countries }: { universities: Uni[]; countries: CountryOpt[] }) {
     const [search, setSearch] = useState("");
@@ -29,7 +40,25 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
 
     const openCreate = () => { setForm(EMPTY); setEditId(null); setModal(true); setMsg(null); };
     const openEdit = (u: Uni) => {
-        setForm({ name: u.name, location: u.location, countryId: u.countryId, ranking: String(u.ranking), description: u.description, established: String(u.established), tuitionMin: String(u.tuitionMin), tuitionMax: String(u.tuitionMax), tuitionCurrency: u.tuitionCurrency });
+        setForm({
+            name: u.name, location: u.location, countryId: u.countryId,
+            ranking: String(u.ranking), description: u.description,
+            established: String(u.established),
+            tuitionMin: String(u.tuitionMin), tuitionMax: String(u.tuitionMax),
+            tuitionCurrency: u.tuitionCurrency,
+            logoPlaceholder: u.logoPlaceholder || "",
+            totalStudents: String(u.totalStudents || ""),
+            internationalStudents: String(u.internationalStudents || ""),
+            acceptanceRate: String(u.acceptanceRate || ""),
+            detailedDescription: u.detailedDescription || "",
+            colorAccent: u.colorAccent || "",
+            highlights: (u.highlights || []).join("\n"),
+            facilities: (u.facilities || []).join("\n"),
+            campusLife: u.campusLife || "",
+            admissionRequirements: (u.admissionRequirements || []).join("\n"),
+            accommodationInfo: u.accommodationInfo || "",
+            tags: (u.tags || []).join("\n"),
+        });
         setEditId(u.id); setModal(true); setMsg(null);
     };
 
@@ -42,6 +71,18 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
             established: parseInt(form.established) || new Date().getFullYear(),
             tuitionMin: parseInt(form.tuitionMin) || 0, tuitionMax: parseInt(form.tuitionMax) || 0,
             tuitionCurrency: form.tuitionCurrency,
+            logoPlaceholder: form.logoPlaceholder,
+            totalStudents: parseInt(form.totalStudents) || 0,
+            internationalStudents: parseInt(form.internationalStudents) || 0,
+            acceptanceRate: parseInt(form.acceptanceRate) || 0,
+            detailedDescription: form.detailedDescription,
+            colorAccent: form.colorAccent,
+            highlights: form.highlights,
+            facilities: form.facilities,
+            campusLife: form.campusLife,
+            admissionRequirements: form.admissionRequirements,
+            accommodationInfo: form.accommodationInfo,
+            tags: form.tags,
         });
         setLoading(false);
         if (res.success) { setModal(false); setForm(EMPTY); setEditId(null); }
@@ -188,6 +229,89 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
                                     <label className="text-xs font-bold text-neutral-500 uppercase">Description</label>
                                     <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3}
                                         className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                </div>
+
+                                {/* ── Extended Fields ── */}
+                                <div className="border-t border-neutral-100 pt-4">
+                                    <p className="text-xs font-bold text-neutral-400 uppercase mb-3">Stats & Styling</p>
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                            <div>
+                                                <label className="text-xs font-bold text-neutral-500 uppercase">Total Students</label>
+                                                <input type="number" value={form.totalStudents} onChange={(e) => setForm({ ...form, totalStudents: e.target.value })} placeholder="30000"
+                                                    className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-neutral-500 uppercase">Int'l Students</label>
+                                                <input type="number" value={form.internationalStudents} onChange={(e) => setForm({ ...form, internationalStudents: e.target.value })} placeholder="8000"
+                                                    className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-neutral-500 uppercase">Acceptance %</label>
+                                                <input type="number" value={form.acceptanceRate} onChange={(e) => setForm({ ...form, acceptanceRate: e.target.value })} placeholder="25"
+                                                    className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="text-xs font-bold text-neutral-500 uppercase">Logo Placeholder <span className="normal-case text-neutral-400">(emoji)</span></label>
+                                                <input value={form.logoPlaceholder} onChange={(e) => setForm({ ...form, logoPlaceholder: e.target.value })} placeholder="🏛️"
+                                                    className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm text-center text-2xl focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-neutral-500 uppercase">Color Accent <span className="normal-case text-neutral-400">(hex)</span></label>
+                                                <input value={form.colorAccent} onChange={(e) => setForm({ ...form, colorAccent: e.target.value })} placeholder="#662D91"
+                                                    className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-neutral-100 pt-4">
+                                    <p className="text-xs font-bold text-neutral-400 uppercase mb-3">Detailed Content</p>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Detailed Description</label>
+                                            <textarea value={form.detailedDescription} onChange={(e) => setForm({ ...form, detailedDescription: e.target.value })} rows={4}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Campus Life</label>
+                                            <textarea value={form.campusLife} onChange={(e) => setForm({ ...form, campusLife: e.target.value })} rows={3}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Accommodation Info</label>
+                                            <textarea value={form.accommodationInfo} onChange={(e) => setForm({ ...form, accommodationInfo: e.target.value })} rows={3}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-neutral-100 pt-4">
+                                    <p className="text-xs font-bold text-neutral-400 uppercase mb-3">Lists <span className="normal-case text-neutral-400">(one item per line)</span></p>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Highlights</label>
+                                            <textarea value={form.highlights} onChange={(e) => setForm({ ...form, highlights: e.target.value })} rows={3} placeholder={"World-class research\nIndustry partnerships\nGlobal alumni network"}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Facilities</label>
+                                            <textarea value={form.facilities} onChange={(e) => setForm({ ...form, facilities: e.target.value })} rows={3} placeholder={"Library\nSports Center\nStudent Union"}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Admission Requirements</label>
+                                            <textarea value={form.admissionRequirements} onChange={(e) => setForm({ ...form, admissionRequirements: e.target.value })} rows={3} placeholder={"IELTS 6.5+\nBachelor's degree\nStatement of Purpose"}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Tags</label>
+                                            <textarea value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} rows={2} placeholder={"Russell Group\nResearch Intensive\nSETT Engineering"}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                    </div>
                                 </div>
                                 {msg && <p className={`text-xs font-semibold ${msg.type === "ok" ? "text-emerald-600" : "text-red-500"}`}>{msg.text}</p>}
                                 <div className="flex gap-3 pt-2">

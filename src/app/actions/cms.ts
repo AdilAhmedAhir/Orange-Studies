@@ -9,6 +9,11 @@ function slugify(text: string) {
     return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
+/** Parse newline-separated textarea strings into clean arrays */
+function parseArray(str?: string | null): string[] {
+    return str ? str.split("\n").map((s) => s.trim()).filter(Boolean) : [];
+}
+
 function revalidateCMS(opts?: { universitySlug?: string; programSlug?: string; countrySlug?: string }) {
     // Always purge listing pages and admin dashboards
     revalidatePath("/");
@@ -31,12 +36,17 @@ function revalidateCMS(opts?: { universitySlug?: string; programSlug?: string; c
    COUNTRY CRUD
    ═══════════════════════════════════════════════════════ */
 export interface CountryPayload {
-    id?: string;          // if present → update, otherwise → create
+    id?: string;
     name: string;
     code: string;
     flag: string;
     description?: string;
     image?: string;
+    tagline?: string;
+    avgTuition?: string;
+    visaTime?: string;
+    highlights?: string;   // newline-separated
+    colorAccent?: string;
 }
 
 export async function upsertCountry(data: CountryPayload): Promise<{ success: boolean; error?: string }> {
@@ -55,6 +65,11 @@ export async function upsertCountry(data: CountryPayload): Promise<{ success: bo
                     flag: data.flag.trim(),
                     description: data.description || null,
                     image: data.image || null,
+                    tagline: data.tagline || null,
+                    avgTuition: data.avgTuition || null,
+                    visaTime: data.visaTime || null,
+                    highlights: parseArray(data.highlights),
+                    colorAccent: data.colorAccent || null,
                 },
             });
             revalidateCMS({ countrySlug: result.slug || undefined });
@@ -72,6 +87,11 @@ export async function upsertCountry(data: CountryPayload): Promise<{ success: bo
                     slug,
                     description: data.description || null,
                     image: data.image || null,
+                    tagline: data.tagline || null,
+                    avgTuition: data.avgTuition || null,
+                    visaTime: data.visaTime || null,
+                    highlights: parseArray(data.highlights),
+                    colorAccent: data.colorAccent || null,
                 },
             });
         }
@@ -119,6 +139,12 @@ export interface UniversityPayload {
     internationalStudents?: number;
     acceptanceRate?: number;
     colorAccent?: string;
+    highlights?: string;           // newline-separated
+    facilities?: string;           // newline-separated
+    campusLife?: string;
+    admissionRequirements?: string; // newline-separated
+    accommodationInfo?: string;
+    tags?: string;                 // newline-separated
 }
 
 export async function upsertUniversity(data: UniversityPayload): Promise<{ success: boolean; error?: string }> {
@@ -131,24 +157,24 @@ export async function upsertUniversity(data: UniversityPayload): Promise<{ succe
             slug: slugify(data.name),
             name: data.name.trim(),
             location: data.location?.trim() || "",
-            ranking: data.ranking || 999,
+            ranking: Number(data.ranking) || 999,
             logoPlaceholder: data.logoPlaceholder || "🏛️",
-            tuitionMin: data.tuitionMin || 0,
-            tuitionMax: data.tuitionMax || 0,
+            tuitionMin: Number(data.tuitionMin) || 0,
+            tuitionMax: Number(data.tuitionMax) || 0,
             tuitionCurrency: data.tuitionCurrency || "GBP",
-            established: data.established || new Date().getFullYear(),
-            totalStudents: data.totalStudents || 0,
-            internationalStudents: data.internationalStudents || 0,
-            acceptanceRate: data.acceptanceRate || 0,
+            established: Number(data.established) || new Date().getFullYear(),
+            totalStudents: Number(data.totalStudents) || 0,
+            internationalStudents: Number(data.internationalStudents) || 0,
+            acceptanceRate: Number(data.acceptanceRate) || 0,
             description: data.description || "",
             detailedDescription: data.detailedDescription || data.description || "",
-            highlights: [] as string[],
-            facilities: [] as string[],
-            campusLife: "",
-            admissionRequirements: [] as string[],
-            accommodationInfo: "",
+            highlights: parseArray(data.highlights),
+            facilities: parseArray(data.facilities),
+            campusLife: data.campusLife || "",
+            admissionRequirements: parseArray(data.admissionRequirements),
+            accommodationInfo: data.accommodationInfo || "",
             colorAccent: data.colorAccent || "#662D91",
-            tags: [] as string[],
+            tags: parseArray(data.tags),
             countryId: data.countryId,
         };
 
@@ -203,6 +229,11 @@ export interface ProgramPayload {
     studyMode: string;
     scholarshipAvailable?: boolean;
     applicationDeadline?: string;
+    detailedDescription?: string;
+    intakeDates?: string;          // newline-separated
+    modules?: string;              // newline-separated
+    entryRequirements?: string;    // newline-separated
+    careerOutcomes?: string;       // newline-separated
 }
 
 export async function upsertProgram(data: ProgramPayload): Promise<{ success: boolean; error?: string }> {
@@ -216,14 +247,14 @@ export async function upsertProgram(data: ProgramPayload): Promise<{ success: bo
             title: data.title.trim(),
             level: data.level || "Bachelor",
             duration: data.duration || "4 years",
-            tuitionFee: data.tuitionFee || 0,
+            tuitionFee: Number(data.tuitionFee) || 0,
             currency: data.currency || "GBP",
-            intakeDates: ["September"],
+            intakeDates: parseArray(data.intakeDates),
             description: data.description || "",
-            detailedDescription: data.description || "",
-            modules: [] as string[],
-            entryRequirements: [] as string[],
-            careerOutcomes: [] as string[],
+            detailedDescription: data.detailedDescription || data.description || "",
+            modules: parseArray(data.modules),
+            entryRequirements: parseArray(data.entryRequirements),
+            careerOutcomes: parseArray(data.careerOutcomes),
             scholarshipAvailable: data.scholarshipAvailable || false,
             applicationDeadline: data.applicationDeadline || "Rolling",
             studyMode: data.studyMode || "Full-time",

@@ -45,6 +45,11 @@ model Country {
   slug        String?  @unique
   description String?  @db.Text
   image       String?  // URL to country hero image
+  tagline     String?
+  avgTuition  String?
+  visaTime    String?
+  highlights  String[]
+  colorAccent String?
   createdAt   DateTime @default(now())
 
   universities University[]

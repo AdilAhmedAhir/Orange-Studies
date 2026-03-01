@@ -24,6 +24,11 @@ export default async function CountriesCMSPage() {
         description: c.description || "",
         image: c.image || "",
         universityCount: c._count.universities,
+        tagline: c.tagline || "",
+        avgTuition: c.avgTuition || "",
+        visaTime: c.visaTime || "",
+        highlights: c.highlights || [],
+        colorAccent: c.colorAccent || "",
     }));
 
     return <CountriesCMSClient countries={serialized} />;

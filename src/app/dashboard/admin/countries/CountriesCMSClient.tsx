@@ -9,9 +9,11 @@ import { upsertCountry, deleteCountry, seedDefaultCountries } from "@/app/action
 interface Country {
     id: string; name: string; code: string; flag: string; slug: string;
     description: string; image: string; universityCount: number;
+    tagline: string; avgTuition: string; visaTime: string;
+    highlights: string[]; colorAccent: string;
 }
 
-const EMPTY = { name: "", code: "", flag: "", description: "", image: "" };
+const EMPTY = { name: "", code: "", flag: "", description: "", image: "", tagline: "", avgTuition: "", visaTime: "", highlights: "", colorAccent: "" };
 
 export default function CountriesCMSClient({ countries }: { countries: Country[] }) {
     const [search, setSearch] = useState("");
@@ -28,7 +30,14 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
 
     const openCreate = () => { setForm(EMPTY); setEditId(null); setModal(true); setMsg(null); };
     const openEdit = (c: Country) => {
-        setForm({ name: c.name, code: c.code, flag: c.flag, description: c.description, image: c.image });
+        setForm({
+            name: c.name, code: c.code, flag: c.flag, description: c.description, image: c.image,
+            tagline: c.tagline || "",
+            avgTuition: c.avgTuition || "",
+            visaTime: c.visaTime || "",
+            highlights: (c.highlights || []).join("\n"),
+            colorAccent: c.colorAccent || "",
+        });
         setEditId(c.id); setModal(true); setMsg(null);
     };
 
@@ -38,6 +47,9 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
             id: editId || undefined,
             name: form.name, code: form.code, flag: form.flag,
             description: form.description, image: form.image,
+            tagline: form.tagline, avgTuition: form.avgTuition,
+            visaTime: form.visaTime, highlights: form.highlights,
+            colorAccent: form.colorAccent,
         });
         setLoading(false);
         if (res.success) { setModal(false); setForm(EMPTY); setEditId(null); }
@@ -171,6 +183,40 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
                                     <label className="text-xs font-bold text-neutral-500 uppercase">Description</label>
                                     <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3}
                                         className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                </div>
+
+                                {/* ── New Fields ── */}
+                                <div className="border-t border-neutral-100 pt-4">
+                                    <p className="text-xs font-bold text-neutral-400 uppercase mb-3">Guide Page Details</p>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Tagline</label>
+                                            <input value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} placeholder="World-Class Research & Heritage"
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="text-xs font-bold text-neutral-500 uppercase">Avg Tuition</label>
+                                                <input value={form.avgTuition} onChange={(e) => setForm({ ...form, avgTuition: e.target.value })} placeholder="£12,000 – £38,000/yr"
+                                                    className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-neutral-500 uppercase">Visa Processing Time</label>
+                                                <input value={form.visaTime} onChange={(e) => setForm({ ...form, visaTime: e.target.value })} placeholder="3–6 weeks"
+                                                    className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Color Accent <span className="normal-case text-neutral-400">(CSS gradient e.g. from-blue-600 to-indigo-800)</span></label>
+                                            <input value={form.colorAccent} onChange={(e) => setForm({ ...form, colorAccent: e.target.value })} placeholder="from-blue-600 to-indigo-800"
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Highlights <span className="normal-case text-neutral-400">(one per line)</span></label>
+                                            <textarea value={form.highlights} onChange={(e) => setForm({ ...form, highlights: e.target.value })} rows={3} placeholder={"Russell Group Universities\nPost-Study Work Visa\nNHS Healthcare"}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                    </div>
                                 </div>
                                 {msg && <p className={`text-xs font-semibold ${msg.type === "ok" ? "text-emerald-600" : "text-red-500"}`}>{msg.text}</p>}
                                 <div className="flex gap-3 pt-2">

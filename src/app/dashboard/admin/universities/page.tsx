@@ -36,6 +36,18 @@ export default async function UniversitiesCMSPage() {
         tuitionCurrency: u.tuitionCurrency,
         established: u.established,
         description: u.description,
+        logoPlaceholder: u.logoPlaceholder,
+        totalStudents: u.totalStudents,
+        internationalStudents: u.internationalStudents,
+        acceptanceRate: u.acceptanceRate,
+        detailedDescription: u.detailedDescription,
+        colorAccent: u.colorAccent,
+        highlights: u.highlights,
+        facilities: u.facilities,
+        campusLife: u.campusLife,
+        admissionRequirements: u.admissionRequirements,
+        accommodationInfo: u.accommodationInfo,
+        tags: u.tags,
     }));
 
     return <UniversitiesCMSClient universities={serialized} countries={countries} />;

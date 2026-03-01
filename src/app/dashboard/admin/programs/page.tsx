@@ -36,6 +36,12 @@ export default async function ProgramsCMSPage() {
         applicationCount: p._count.applications,
         scholarshipAvailable: p.scholarshipAvailable,
         description: p.description,
+        detailedDescription: p.detailedDescription,
+        intakeDates: p.intakeDates,
+        modules: p.modules,
+        entryRequirements: p.entryRequirements,
+        careerOutcomes: p.careerOutcomes,
+        applicationDeadline: p.applicationDeadline,
     }));
 
     return <ProgramsCMSClient programs={serialized} universities={universities} />;

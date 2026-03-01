@@ -11,6 +11,8 @@ interface Prog {
     tuitionFee: number; currency: string; discipline: string; studyMode: string;
     universityId: string; universityName: string; applicationCount: number;
     scholarshipAvailable: boolean; description: string;
+    detailedDescription: string; intakeDates: string[]; modules: string[];
+    entryRequirements: string[]; careerOutcomes: string[]; applicationDeadline: string;
 }
 interface UniOpt { id: string; name: string; }
 
@@ -18,7 +20,13 @@ const LEVELS = ["Bachelor", "Master", "PhD", "Diploma", "Foundation", "Certifica
 const MODES = ["Full-time", "Part-time", "Both", "Online"];
 const DISCIPLINES = ["Engineering & Technology", "Business & Management", "Computer Science & IT", "Medicine & Health", "Arts & Humanities", "Law", "Social Sciences", "Natural Sciences", "Education", "Architecture"];
 
-const EMPTY = { title: "", universityId: "", level: "Bachelor", duration: "", tuitionFee: "", currency: "GBP", description: "", discipline: "", studyMode: "Full-time", scholarship: false, deadline: "" };
+const EMPTY = {
+    title: "", universityId: "", level: "Bachelor", duration: "", tuitionFee: "",
+    currency: "GBP", description: "", discipline: "", studyMode: "Full-time",
+    scholarship: false, deadline: "",
+    detailedDescription: "", intakeDates: "", modules: "",
+    entryRequirements: "", careerOutcomes: "",
+};
 
 export default function ProgramsCMSClient({ programs, universities }: { programs: Prog[]; universities: UniOpt[] }) {
     const [search, setSearch] = useState("");
@@ -33,7 +41,17 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
 
     const openCreate = () => { setForm(EMPTY); setEditId(null); setModal(true); setMsg(null); };
     const openEdit = (p: Prog) => {
-        setForm({ title: p.title, universityId: p.universityId, level: p.level, duration: p.duration, tuitionFee: String(p.tuitionFee), currency: p.currency, description: p.description, discipline: p.discipline, studyMode: p.studyMode, scholarship: p.scholarshipAvailable, deadline: "" });
+        setForm({
+            title: p.title, universityId: p.universityId, level: p.level,
+            duration: p.duration, tuitionFee: String(p.tuitionFee), currency: p.currency,
+            description: p.description, discipline: p.discipline, studyMode: p.studyMode,
+            scholarship: p.scholarshipAvailable, deadline: p.applicationDeadline || "",
+            detailedDescription: p.detailedDescription || "",
+            intakeDates: (p.intakeDates || []).join("\n"),
+            modules: (p.modules || []).join("\n"),
+            entryRequirements: (p.entryRequirements || []).join("\n"),
+            careerOutcomes: (p.careerOutcomes || []).join("\n"),
+        });
         setEditId(p.id); setModal(true); setMsg(null);
     };
 
@@ -47,6 +65,11 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
             discipline: form.discipline as string, studyMode: form.studyMode as string,
             scholarshipAvailable: form.scholarship as boolean,
             applicationDeadline: (form.deadline as string) || "Rolling",
+            detailedDescription: form.detailedDescription as string,
+            intakeDates: form.intakeDates as string,
+            modules: form.modules as string,
+            entryRequirements: form.entryRequirements as string,
+            careerOutcomes: form.careerOutcomes as string,
         });
         setLoading(false);
         if (res.success) { setModal(false); setForm(EMPTY); setEditId(null); }
@@ -202,6 +225,49 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
                                 <div className="flex items-center gap-2">
                                     <input type="checkbox" id="scholarship" checked={form.scholarship as boolean} onChange={(e) => setForm({ ...form, scholarship: e.target.checked })} className="rounded" />
                                     <label htmlFor="scholarship" className="text-sm text-neutral-700">Scholarship Available</label>
+                                </div>
+
+                                {/* ── Extended Fields ── */}
+                                <div className="border-t border-neutral-100 pt-4">
+                                    <p className="text-xs font-bold text-neutral-400 uppercase mb-3">Detailed Content</p>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Detailed Description</label>
+                                            <textarea value={form.detailedDescription as string} onChange={(e) => setForm({ ...form, detailedDescription: e.target.value })} rows={4}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Application Deadline</label>
+                                            <input value={form.deadline as string} onChange={(e) => setForm({ ...form, deadline: e.target.value })} placeholder="Rolling / August 31"
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-neutral-100 pt-4">
+                                    <p className="text-xs font-bold text-neutral-400 uppercase mb-3">Lists <span className="normal-case text-neutral-400">(one item per line)</span></p>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Intake Dates</label>
+                                            <textarea value={form.intakeDates as string} onChange={(e) => setForm({ ...form, intakeDates: e.target.value })} rows={2} placeholder={"September\nJanuary"}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Modules</label>
+                                            <textarea value={form.modules as string} onChange={(e) => setForm({ ...form, modules: e.target.value })} rows={3} placeholder={"Advanced Mathematics\nData Structures\nAI & Machine Learning"}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Entry Requirements</label>
+                                            <textarea value={form.entryRequirements as string} onChange={(e) => setForm({ ...form, entryRequirements: e.target.value })} rows={3} placeholder={"IELTS 6.5+\n2:1 Honours degree\nPersonal Statement"}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-neutral-500 uppercase">Career Outcomes</label>
+                                            <textarea value={form.careerOutcomes as string} onChange={(e) => setForm({ ...form, careerOutcomes: e.target.value })} rows={3} placeholder={"Software Engineer\nData Scientist\nProduct Manager"}
+                                                className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                    </div>
                                 </div>
                                 {msg && <p className={`text-xs font-semibold ${msg.type === "ok" ? "text-emerald-600" : "text-red-500"}`}>{msg.text}</p>}
                                 <div className="flex gap-3 pt-2">

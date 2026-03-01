@@ -3,10 +3,26 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, MapPin, GraduationCap, DollarSign, Clock } from "lucide-react";
+import { ArrowRight, GraduationCap, DollarSign, Clock } from "lucide-react";
 
-/* ── country data ──────────────────────────────────── */
-const countries = [
+/* ── country type (passed from server) ────────────── */
+export interface CountryData {
+    slug: string;
+    name: string;
+    flag: string;
+    tagline: string;
+    universities: string;
+    avgTuition: string;
+    visaTime: string;
+    color: string;
+    accent: string;
+    highlights: string[];
+    description?: string;
+    image?: string;
+}
+
+/* ── fallback country data ──────────────────────────── */
+const fallbackCountries: CountryData[] = [
     {
         slug: "united-kingdom",
         name: "United Kingdom",
@@ -81,14 +97,14 @@ const countries = [
     },
 ];
 
-export { countries };
+export { fallbackCountries as countries };
 
 /* ── country card ────────────────────────────────────── */
 function CountryCard({
     country,
     index,
 }: {
-    country: (typeof countries)[0];
+    country: CountryData;
     index: number;
 }) {
     return (
@@ -147,7 +163,7 @@ function CountryCard({
 
                     {/* Highlight chips */}
                     <div className="mt-4 flex flex-wrap gap-1.5">
-                        {country.highlights.map((h) => (
+                        {country.highlights.map((h: string) => (
                             <span
                                 key={h}
                                 className="rounded-full bg-neutral-100 px-2.5 py-1 text-[10px] font-semibold text-neutral-500"
@@ -168,7 +184,8 @@ function CountryCard({
 }
 
 /* ── page section ────────────────────────────────────── */
-export function CountryGuidesHero() {
+export function CountryGuidesHero({ countries: dynamicCountries }: { countries?: CountryData[] }) {
+    const displayCountries = dynamicCountries && dynamicCountries.length > 0 ? dynamicCountries : fallbackCountries;
     const ref = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
         target: ref,
@@ -240,9 +257,12 @@ export function CountryGuidesHero() {
             {/* Country grid */}
             <section className="relative z-10 bg-white px-6 py-20 lg:py-28">
                 <div className="mx-auto grid max-w-6xl gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    {countries.map((c, i) => (
-                        <CountryCard key={c.slug} country={c} index={i} />
+                    {displayCountries.map((c, i) => (
+                        <CountryCard key={c.slug || i} country={c} index={i} />
                     ))}
+                    {displayCountries.length === 0 && (
+                        <div className="col-span-full text-center py-12 text-neutral-400">No countries found. Add countries via the Admin dashboard.</div>
+                    )}
                 </div>
             </section>
         </>
