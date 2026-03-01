@@ -29,6 +29,7 @@ model User {
   nationality   String?
   currentCity   String?
   emailVerified DateTime?
+  image         String?   // Profile picture URL (Vercel Blob)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

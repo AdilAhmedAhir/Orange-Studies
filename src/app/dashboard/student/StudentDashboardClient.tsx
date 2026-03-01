@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import {
@@ -9,12 +9,13 @@ import {
     LogOut, ChevronRight, Clock, CheckCircle, AlertCircle,
     Eye, ArrowRight, GraduationCap,
     Sparkles, Menu, X, MessageCircle, Mail, Search,
-    RotateCcw, Loader2,
+    RotateCcw, Loader2, Camera,
 } from "lucide-react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
 import { reuploadDocument } from "@/app/actions/admin";
 import { uploadFile } from "@/app/actions/upload";
-import { updateProfile, changePassword } from "@/app/actions/profile";
+import { updateProfile, changePassword, uploadProfilePicture } from "@/app/actions/profile";
+import Image from "next/image";
 
 /* ── Types ── */
 interface AppData {
@@ -47,6 +48,7 @@ interface UserData {
     phone: string;
     nationality: string;
     currentCity: string;
+    image: string;
     initials: string;
 }
 
@@ -78,6 +80,24 @@ export default function StudentDashboardClient({
     const [pwdForm, setPwdForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
     const [profileMsg, setProfileMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
     const [isProfPending, startProfileTransition] = useTransition();
+    const [avatarUrl, setAvatarUrl] = useState(user.image);
+    const [avatarUploading, setAvatarUploading] = useState(false);
+    const avatarRef = useRef<HTMLInputElement>(null);
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setAvatarUploading(true);
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await uploadProfilePicture(fd);
+        setAvatarUploading(false);
+        if (res.success && res.url) {
+            setAvatarUrl(res.url);
+        } else {
+            alert(res.error || "Upload failed.");
+        }
+    };
 
     const hasApps = applications.length > 0;
     const offerCount = applications.filter((a) => a.status === "offer-received" || a.status === "offer-accepted").length;
@@ -531,8 +551,19 @@ export default function StudentDashboardClient({
                                 {/* Profile Card */}
                                 <div className="rounded-2xl border border-neutral-200/60 bg-white p-8 shadow-sm">
                                     <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-                                        <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-purple to-brand-orange text-2xl font-black text-white shadow-lg shadow-brand-purple/20">
-                                            {user.initials}
+                                        <div className="relative group">
+                                            <input type="file" accept="image/*" ref={avatarRef} onChange={handleAvatarUpload} className="hidden" />
+                                            <button type="button" onClick={() => avatarRef.current?.click()} disabled={avatarUploading}
+                                                className="relative flex h-20 w-20 items-center justify-center rounded-2xl overflow-hidden bg-gradient-to-br from-brand-purple to-brand-orange text-2xl font-black text-white shadow-lg shadow-brand-purple/20 transition-all hover:shadow-xl">
+                                                {avatarUrl ? (
+                                                    <Image src={avatarUrl} alt="Avatar" fill className="object-cover" />
+                                                ) : (
+                                                    <span>{user.initials}</span>
+                                                )}
+                                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    {avatarUploading ? <Loader2 className="h-5 w-5 text-white animate-spin" /> : <Camera className="h-5 w-5 text-white" />}
+                                                </div>
+                                            </button>
                                         </div>
                                         <div className="flex-1 text-center sm:text-left">
                                             <h3 className="text-xl font-bold text-neutral-900 font-[family-name:var(--font-heading)]">{user.fullName}</h3>
