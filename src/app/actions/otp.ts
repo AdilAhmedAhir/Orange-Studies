@@ -11,27 +11,44 @@ function randomOtp(): string {
 
 /* ── Generate & persist OTP ── */
 export async function generateOtp(email: string, type: "VERIFY" | "RESET") {
+    const normalEmail = email.toLowerCase().trim();
     // Delete any existing OTPs for this email + type
-    await prisma.otpCode.deleteMany({ where: { email, type } });
+    await prisma.otpCode.deleteMany({ where: { email: normalEmail, type } });
 
     const code = randomOtp();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     await prisma.otpCode.create({
-        data: { email, code, type, expiresAt },
+        data: { email: normalEmail, code, type, expiresAt },
     });
 
+    console.log(`[OTP] Generated ${type} code for ${normalEmail}`);
     return code;
 }
 
 /* ── Verify OTP ── */
 export async function verifyOtp(email: string, code: string, type: "VERIFY" | "RESET") {
+    const normalEmail = email.toLowerCase().trim();
+    const trimmedCode = code.trim();
+
+    console.log(`[OTP] Verifying ${type} for ${normalEmail}, code: ${trimmedCode}`);
+
     const otp = await prisma.otpCode.findFirst({
-        where: { email, type, code },
+        where: { email: normalEmail, type, code: trimmedCode },
         orderBy: { createdAt: "desc" },
     });
 
-    if (!otp) return { valid: false, error: "Invalid OTP code." };
+    if (!otp) {
+        // Debug: check if any OTP exists for this email at all
+        const anyOtp = await prisma.otpCode.findFirst({ where: { email: normalEmail, type } });
+        if (anyOtp) {
+            console.log(`[OTP] Code mismatch — stored: ${anyOtp.code}, received: ${trimmedCode}`);
+        } else {
+            console.log(`[OTP] No OTP found for ${normalEmail} type=${type}`);
+        }
+        return { valid: false, error: "Invalid OTP code." };
+    }
+
     if (otp.expiresAt < new Date()) {
         await prisma.otpCode.delete({ where: { id: otp.id } });
         return { valid: false, error: "OTP has expired. Please request a new one." };
@@ -39,6 +56,7 @@ export async function verifyOtp(email: string, code: string, type: "VERIFY" | "R
 
     // Delete the used OTP
     await prisma.otpCode.delete({ where: { id: otp.id } });
+    console.log(`[OTP] Verified successfully for ${normalEmail}`);
     return { valid: true };
 }
 
