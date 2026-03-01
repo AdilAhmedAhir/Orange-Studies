@@ -21,7 +21,7 @@ function generatePassword(length = 8): string {
 export async function createStaffAccount(data: {
     fullName: string;
     email: string;
-    role: "ADMIN" | "MANAGER";
+    role: "ADMIN" | "MANAGER" | "STUDENT";
 }): Promise<{ success: boolean; password?: string; error?: string }> {
     try {
         const admin = await requireAdmin(false);
@@ -58,7 +58,7 @@ export async function createStaffAccount(data: {
    ═══════════════════════════════════════════════════════ */
 export async function changeUserRole(
     userId: string,
-    newRole: "STUDENT" | "ADMIN" | "MANAGER" | "RECRUITER" | "INSTITUTION"
+    newRole: "STUDENT" | "ADMIN" | "MANAGER"
 ): Promise<{ success: boolean; error?: string }> {
     try {
         const admin = await requireAdmin(false);

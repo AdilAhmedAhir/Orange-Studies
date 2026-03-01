@@ -7,7 +7,7 @@ import { signOut } from "next-auth/react";
 import { LogoIcon } from "@/components/ui/LogoIcon";
 import {
     LayoutDashboard, Building2, GraduationCap, Globe, Users,
-    LogOut, Menu, X, FileText, ChevronRight, Settings,
+    LogOut, Menu, X, FileText, ChevronRight, Settings, User,
 } from "lucide-react";
 
 /* ── Navigation Map ── */
@@ -35,6 +35,7 @@ const NAV_SECTIONS = [
     {
         label: "System",
         items: [
+            { href: "/dashboard/admin/profile", label: "My Profile", icon: User },
             { href: "/dashboard/admin/settings", label: "Settings", icon: Settings },
         ],
     },

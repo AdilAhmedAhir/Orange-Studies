@@ -44,6 +44,7 @@ export function Navbar() {
     const isPortal = pathname.startsWith('/dashboard') || pathname.startsWith('/login') || pathname.startsWith('/admin') || pathname.startsWith('/apply');
 
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const [mobileAccordion, setMobileAccordion] = useState<string | null>(null);
 
     // Lock body scroll when mobile menu is open
     // NOTE: All hooks MUST be called before any conditional return (Rules of Hooks)
@@ -179,10 +180,10 @@ export function Navbar() {
                             exit={{ x: "100%" }}
                             transition={{ type: "spring", damping: 28, stiffness: 220 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-gradient-to-b from-neutral-900 via-neutral-900 to-brand-deep shadow-2xl"
+                            className="absolute right-0 top-0 flex h-full w-80 max-w-[85vw] flex-col bg-gradient-to-b from-neutral-900 via-neutral-900 to-brand-deep shadow-2xl"
                         >
-                            {/* Close button */}
-                            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/10">
+                            {/* Header */}
+                            <div className="flex shrink-0 items-center justify-between px-6 pt-6 pb-4 border-b border-white/10">
                                 <Link href="/" onClick={() => setIsMobileOpen(false)} className="flex items-center gap-2">
                                     <LogoIcon size={36} className="drop-shadow-md" />
                                     <span className="text-lg font-bold font-[family-name:var(--font-heading)]">
@@ -199,8 +200,8 @@ export function Navbar() {
                                 </button>
                             </div>
 
-                            {/* Nav links */}
-                            <div className="flex flex-col gap-1 px-4 py-6 overflow-y-auto" style={{ maxHeight: "calc(100vh - 180px)" }}>
+                            {/* Nav links — flex-1 scrollable */}
+                            <div className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
                                 {navLinks.map((link, i) => (
                                     <motion.div
                                         key={link.name}
@@ -208,37 +209,61 @@ export function Navbar() {
                                         animate={{ x: 0, opacity: 1 }}
                                         transition={{ delay: 0.08 + i * 0.05, type: "spring", stiffness: 200, damping: 20 }}
                                     >
-                                        <Link
-                                            href={link.href}
-                                            onClick={() => setIsMobileOpen(false)}
-                                            className="block rounded-xl px-4 py-3.5 text-[15px] font-medium text-white/80 transition-all hover:bg-white/5 hover:text-white hover:pl-5"
-                                        >
-                                            {link.name}
-                                        </Link>
-                                        {link.children && (
-                                            <div className="ml-4 mt-0.5 space-y-0.5 border-l border-white/10 pl-3">
-                                                {link.children.map((child) => (
-                                                    <Link
-                                                        key={child.name}
-                                                        href={child.href}
-                                                        onClick={() => setIsMobileOpen(false)}
-                                                        className="block rounded-lg px-3 py-2 text-[13px] font-medium text-white/50 transition-all hover:bg-white/5 hover:text-white/80"
-                                                    >
-                                                        {child.name}
-                                                    </Link>
-                                                ))}
-                                            </div>
+                                        {link.children ? (
+                                            /* ── Accordion parent ── */
+                                            <>
+                                                <button
+                                                    onClick={() => setMobileAccordion(mobileAccordion === link.name ? null : link.name)}
+                                                    className="flex w-full items-center justify-between rounded-xl px-4 py-3.5 text-[15px] font-medium text-white/80 transition-all hover:bg-white/5 hover:text-white"
+                                                >
+                                                    {link.name}
+                                                    <ChevronDown className={`h-4 w-4 text-white/40 transition-transform duration-200 ${mobileAccordion === link.name ? "rotate-180" : ""}`} />
+                                                </button>
+                                                <AnimatePresence>
+                                                    {mobileAccordion === link.name && (
+                                                        <motion.div
+                                                            initial={{ height: 0, opacity: 0 }}
+                                                            animate={{ height: "auto", opacity: 1 }}
+                                                            exit={{ height: 0, opacity: 0 }}
+                                                            transition={{ duration: 0.2 }}
+                                                            className="overflow-hidden"
+                                                        >
+                                                            <div className="ml-4 space-y-0.5 border-l border-white/10 pl-3 pb-1">
+                                                                {link.children.map((child) => (
+                                                                    <Link
+                                                                        key={child.name}
+                                                                        href={child.href}
+                                                                        onClick={() => setIsMobileOpen(false)}
+                                                                        className="block rounded-lg px-3 py-2 text-[13px] font-medium text-white/50 transition-all hover:bg-white/5 hover:text-white/80"
+                                                                    >
+                                                                        {child.name}
+                                                                    </Link>
+                                                                ))}
+                                                            </div>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </>
+                                        ) : (
+                                            /* ── Normal link ── */
+                                            <Link
+                                                href={link.href}
+                                                onClick={() => setIsMobileOpen(false)}
+                                                className="block rounded-xl px-4 py-3.5 text-[15px] font-medium text-white/80 transition-all hover:bg-white/5 hover:text-white hover:pl-5"
+                                            >
+                                                {link.name}
+                                            </Link>
                                         )}
                                     </motion.div>
                                 ))}
                             </div>
 
-                            {/* Bottom CTA */}
+                            {/* Bottom CTA — shrink-0, never overlaps */}
                             <motion.div
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.4 }}
-                                className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10 space-y-3"
+                                className="shrink-0 border-t border-white/10 p-6 space-y-3"
                             >
                                 <Link
                                     href="/login"

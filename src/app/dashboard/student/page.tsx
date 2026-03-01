@@ -74,6 +74,9 @@ export default async function StudentDashboardPage() {
     const userData = {
         fullName: user.fullName,
         email: user.email,
+        phone: user.phone || "",
+        nationality: user.nationality || "",
+        currentCity: user.currentCity || "",
         initials: user.fullName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2),
     };
 

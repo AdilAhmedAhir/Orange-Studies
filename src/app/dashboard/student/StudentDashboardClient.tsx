@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import {
@@ -14,6 +14,7 @@ import {
 import { LogoIcon } from "@/components/ui/LogoIcon";
 import { reuploadDocument } from "@/app/actions/admin";
 import { uploadFile } from "@/app/actions/upload";
+import { updateProfile, changePassword } from "@/app/actions/profile";
 
 /* ── Types ── */
 interface AppData {
@@ -43,6 +44,9 @@ interface DocData {
 interface UserData {
     fullName: string;
     email: string;
+    phone: string;
+    nationality: string;
+    currentCity: string;
     initials: string;
 }
 
@@ -69,6 +73,11 @@ export default function StudentDashboardClient({
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [reuploadingDoc, setReuploadingDoc] = useState<string | null>(null);
     const [reuploadProgress, setReuploadProgress] = useState<Record<string, boolean>>({});
+    const [profileEditing, setProfileEditing] = useState(false);
+    const [profileForm, setProfileForm] = useState({ fullName: user.fullName, phone: user.phone, nationality: user.nationality, currentCity: user.currentCity });
+    const [pwdForm, setPwdForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    const [profileMsg, setProfileMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+    const [isProfPending, startProfileTransition] = useTransition();
 
     const hasApps = applications.length > 0;
     const offerCount = applications.filter((a) => a.status === "offer-received" || a.status === "offer-accepted").length;
@@ -127,12 +136,12 @@ export default function StudentDashboardClient({
                         ))}
 
                         <div className="pt-4">
-                            <button className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800 transition-all">
+                            <Link href="/contact" className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800 transition-all">
                                 <Calendar className="h-5 w-5 text-neutral-400" /> Book Consultation
-                            </button>
-                            <button className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800 transition-all">
+                            </Link>
+                            <Link href="/contact" className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800 transition-all">
                                 <MessageCircle className="h-5 w-5 text-neutral-400" /> Support
-                            </button>
+                            </Link>
                         </div>
                     </nav>
 
@@ -519,6 +528,7 @@ export default function StudentDashboardClient({
                                     <p className="text-sm text-neutral-500">Manage your personal information and preferences.</p>
                                 </div>
 
+                                {/* Profile Card */}
                                 <div className="rounded-2xl border border-neutral-200/60 bg-white p-8 shadow-sm">
                                     <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
                                         <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-purple to-brand-orange text-2xl font-black text-white shadow-lg shadow-brand-purple/20">
@@ -531,25 +541,96 @@ export default function StudentDashboardClient({
                                                 <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {user.email}</span>
                                             </div>
                                         </div>
-                                        <button className="rounded-xl border border-neutral-200 px-5 py-2 text-sm font-semibold text-neutral-700 transition-all hover:bg-neutral-50">
-                                            Edit Profile
+                                        <button onClick={() => { setProfileEditing(!profileEditing); setProfileMsg(null); }}
+                                            className="rounded-xl border border-neutral-200 px-5 py-2 text-sm font-semibold text-neutral-700 transition-all hover:bg-neutral-50">
+                                            {profileEditing ? "Cancel" : "Edit Profile"}
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="rounded-2xl border border-neutral-200/60 bg-white p-8 shadow-sm">
-                                    <h3 className="text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)] mb-6">Account Details</h3>
-                                    <div className="grid gap-4 sm:grid-cols-2">
-                                        {[
-                                            { label: "Full Name", value: user.fullName },
-                                            { label: "Email", value: user.email },
-                                        ].map(({ label, value }) => (
-                                            <div key={label} className="rounded-xl bg-neutral-50 px-5 py-4">
-                                                <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide">{label}</p>
-                                                <p className="mt-1 text-sm font-medium text-neutral-800">{value}</p>
+                                {/* Edit Form */}
+                                {profileEditing ? (
+                                    <div className="rounded-2xl border border-neutral-200/60 bg-white p-8 shadow-sm">
+                                        <h3 className="text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)] mb-6">Edit Details</h3>
+                                        <form onSubmit={(e) => { e.preventDefault(); setProfileMsg(null); startProfileTransition(async () => { const res = await updateProfile(profileForm); setProfileMsg(res.success ? { type: "ok", text: "Profile updated!" } : { type: "err", text: res.error || "Failed." }); if (res.success) setProfileEditing(false); }); }} className="space-y-4 max-w-lg">
+                                            <div>
+                                                <label className="mb-1.5 block text-xs font-bold text-neutral-500 uppercase">Full Name *</label>
+                                                <input required value={profileForm.fullName} onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
+                                                    className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800 focus:border-brand-purple focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
                                             </div>
-                                        ))}
+                                            <div>
+                                                <label className="mb-1.5 block text-xs font-bold text-neutral-500 uppercase">Phone</label>
+                                                <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                                                    className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800 focus:border-brand-purple focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                            </div>
+                                            <div className="grid gap-4 sm:grid-cols-2">
+                                                <div>
+                                                    <label className="mb-1.5 block text-xs font-bold text-neutral-500 uppercase">Nationality</label>
+                                                    <input value={profileForm.nationality} onChange={(e) => setProfileForm({ ...profileForm, nationality: e.target.value })}
+                                                        className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800 focus:border-brand-purple focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                                </div>
+                                                <div>
+                                                    <label className="mb-1.5 block text-xs font-bold text-neutral-500 uppercase">City</label>
+                                                    <input value={profileForm.currentCity} onChange={(e) => setProfileForm({ ...profileForm, currentCity: e.target.value })}
+                                                        className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800 focus:border-brand-purple focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                                </div>
+                                            </div>
+                                            {profileMsg && (
+                                                <div className={`rounded-xl border px-4 py-3 text-xs font-semibold ${profileMsg.type === "ok" ? "bg-emerald-50 border-emerald-200 text-emerald-600" : "bg-red-50 border-red-200 text-red-600"}`}>{profileMsg.text}</div>
+                                            )}
+                                            <button type="submit" disabled={isProfPending}
+                                                className="inline-flex items-center gap-2 rounded-xl bg-brand-purple px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:shadow-md disabled:opacity-50">
+                                                {isProfPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Save Changes
+                                            </button>
+                                        </form>
                                     </div>
+                                ) : (
+                                    <div className="rounded-2xl border border-neutral-200/60 bg-white p-8 shadow-sm">
+                                        <h3 className="text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)] mb-6">Account Details</h3>
+                                        <div className="grid gap-4 sm:grid-cols-2">
+                                            {[
+                                                { label: "Full Name", value: user.fullName },
+                                                { label: "Email", value: user.email },
+                                                { label: "Phone", value: user.phone || "—" },
+                                                { label: "Nationality", value: user.nationality || "—" },
+                                                { label: "City", value: user.currentCity || "—" },
+                                            ].map(({ label, value }) => (
+                                                <div key={label} className="rounded-xl bg-neutral-50 px-5 py-4">
+                                                    <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-wide">{label}</p>
+                                                    <p className="mt-1 text-sm font-medium text-neutral-800">{value}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Change Password */}
+                                <div className="rounded-2xl border border-neutral-200/60 bg-white p-8 shadow-sm">
+                                    <h3 className="text-lg font-bold text-neutral-800 font-[family-name:var(--font-heading)] mb-6">Change Password</h3>
+                                    <form onSubmit={(e) => { e.preventDefault(); setProfileMsg(null); startProfileTransition(async () => { const res = await changePassword(pwdForm); if (res.success) { setProfileMsg({ type: "ok", text: "Password changed!" }); setPwdForm({ currentPassword: "", newPassword: "", confirmPassword: "" }); } else { setProfileMsg({ type: "err", text: res.error || "Failed." }); } }); }} className="space-y-4 max-w-lg">
+                                        <div>
+                                            <label className="mb-1.5 block text-xs font-bold text-neutral-500 uppercase">Current Password *</label>
+                                            <input type="password" required value={pwdForm.currentPassword} onChange={(e) => setPwdForm({ ...pwdForm, currentPassword: e.target.value })}
+                                                className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800 focus:border-brand-purple focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1.5 block text-xs font-bold text-neutral-500 uppercase">New Password *</label>
+                                            <input type="password" required minLength={6} value={pwdForm.newPassword} onChange={(e) => setPwdForm({ ...pwdForm, newPassword: e.target.value })}
+                                                className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800 focus:border-brand-purple focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        <div>
+                                            <label className="mb-1.5 block text-xs font-bold text-neutral-500 uppercase">Confirm New Password *</label>
+                                            <input type="password" required minLength={6} value={pwdForm.confirmPassword} onChange={(e) => setPwdForm({ ...pwdForm, confirmPassword: e.target.value })}
+                                                className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-800 focus:border-brand-purple focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20" />
+                                        </div>
+                                        {profileMsg && (
+                                            <div className={`rounded-xl border px-4 py-3 text-xs font-semibold ${profileMsg.type === "ok" ? "bg-emerald-50 border-emerald-200 text-emerald-600" : "bg-red-50 border-red-200 text-red-600"}`}>{profileMsg.text}</div>
+                                        )}
+                                        <button type="submit" disabled={isProfPending}
+                                            className="inline-flex items-center gap-2 rounded-xl bg-brand-purple px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:shadow-md disabled:opacity-50">
+                                            {isProfPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Change Password
+                                        </button>
+                                    </form>
                                 </div>
                             </motion.div>
                         )}

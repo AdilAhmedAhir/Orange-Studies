@@ -20,13 +20,13 @@ const ROLE_COLORS: Record<string, { bg: string; text: string; icon: React.ReactN
     INSTITUTION: { bg: "bg-amber-100", text: "text-amber-700", icon: <Building2 className="h-3 w-3" /> },
 };
 
-const ROLES = ["STUDENT", "MANAGER", "ADMIN", "RECRUITER", "INSTITUTION"] as const;
+const ROLES = ["STUDENT", "MANAGER", "ADMIN"] as const;
 
 export default function UsersCMSClient({ users, currentUserId, isAdmin }: { users: UserRow[]; currentUserId: string; isAdmin: boolean }) {
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState<string>("ALL");
     const [modal, setModal] = useState(false);
-    const [form, setForm] = useState({ fullName: "", email: "", role: "MANAGER" as "ADMIN" | "MANAGER" });
+    const [form, setForm] = useState({ fullName: "", email: "", role: "STUDENT" as "ADMIN" | "MANAGER" | "STUDENT" });
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
     const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
         if (res.success && res.password) {
             setGeneratedPassword(res.password);
             setMsg({ type: "ok", text: `Account created for ${form.email}` });
-            setForm({ fullName: "", email: "", role: "MANAGER" });
+            setForm({ fullName: "", email: "", role: "STUDENT" });
         } else {
             setMsg({ type: "err", text: res.error || "Failed." });
         }
@@ -119,7 +119,7 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                 {isAdmin && (
                     <button onClick={() => { setModal(true); setMsg(null); setGeneratedPassword(null); }}
                         className="inline-flex items-center gap-2 rounded-xl bg-brand-purple px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:shadow-md hover:scale-105">
-                        <Plus className="h-4 w-4" /> Add Staff
+                        <Plus className="h-4 w-4" /> Add User
                     </button>
                 )}
             </div>
@@ -142,7 +142,8 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                                 const rc = ROLE_COLORS[u.role] || ROLE_COLORS.STUDENT;
                                 const isSelf = u.id === currentUserId;
                                 return (
-                                    <motion.tr key={u.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-gray-50 transition-colors">
+                                    <motion.tr key={u.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                        onClick={() => window.location.href = `/dashboard/admin/users/${u.id}`}>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-purple to-brand-orange text-xs font-bold text-white">
@@ -154,7 +155,7 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                                             <div className="relative">
                                                 {isAdmin && !isSelf ? (
                                                     <>
@@ -182,7 +183,7 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                                         <td className="hidden md:table-cell px-6 py-4"><span className="font-semibold text-neutral-800">{u.applicationCount}</span></td>
                                         <td className="hidden md:table-cell px-6 py-4 text-xs text-neutral-500">{u.joinedDate}</td>
                                         {isAdmin && (
-                                            <td className="px-6 py-4 text-right">
+                                            <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
                                                 {!isSelf && (
                                                     <button onClick={() => handleDelete(u.id)} disabled={deleting === u.id}
                                                         className="rounded-lg p-2 text-neutral-400 transition-all hover:bg-red-50 hover:text-red-500 disabled:opacity-50">
@@ -213,7 +214,7 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                         <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             className="fixed inset-x-4 top-1/2 z-50 mx-auto max-w-md -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-bold text-neutral-900 font-[family-name:var(--font-heading)]">Add Staff Account</h3>
+                                <h3 className="text-lg font-bold text-neutral-900 font-[family-name:var(--font-heading)]">Add User Account</h3>
                                 <button onClick={() => { setModal(false); setGeneratedPassword(null); }}><X className="h-5 w-5 text-neutral-400 hover:text-neutral-700" /></button>
                             </div>
 
@@ -249,14 +250,15 @@ export default function UsersCMSClient({ users, currentUserId, isAdmin }: { user
                                     </div>
                                     <div>
                                         <label className="text-xs font-bold text-neutral-500 uppercase">Role *</label>
-                                        <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as "ADMIN" | "MANAGER" })}
+                                        <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as "ADMIN" | "MANAGER" | "STUDENT" })}
                                             className="mt-1 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm focus:border-brand-purple focus:outline-none focus:ring-2 focus:ring-brand-purple/20">
+                                            <option value="STUDENT">Student</option>
                                             <option value="MANAGER">Manager</option>
                                             <option value="ADMIN">Admin</option>
                                         </select>
                                     </div>
                                     <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-700">
-                                        <strong>⚠️ Note:</strong> A random secure password will be generated. You must share it with the staff member directly.
+                                        <strong>⚠️ Note:</strong> A random secure password will be generated. You must share it with the user directly.
                                     </div>
                                     {msg && <p className={`text-xs font-semibold ${msg.type === "ok" ? "text-emerald-600" : "text-red-500"}`}>{msg.text}</p>}
                                     <div className="flex gap-3 pt-2">

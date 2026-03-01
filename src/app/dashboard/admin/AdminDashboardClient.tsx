@@ -209,6 +209,9 @@ export default function AdminDashboardClient({
                             <h3 className="flex items-center gap-2 text-sm font-bold text-gray-800">
                                 <FileText className="h-4 w-4 text-brand-purple" /> Recent Applications
                             </h3>
+                            <Link href="/dashboard/admin/applications" className="text-xs font-semibold text-brand-purple hover:text-brand-deep transition-colors">
+                                View All →
+                            </Link>
                         </div>
 
                         {recentApplications.length > 0 ? (
@@ -230,7 +233,8 @@ export default function AdminDashboardClient({
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 transition={{ delay: i * 0.04 }}
-                                                className="hover:bg-gray-50 transition-colors"
+                                                className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                                onClick={() => window.location.href = `/dashboard/admin/application/${app.appId}`}
                                             >
                                                 <td className="px-6 py-4">
                                                     <p className="font-semibold text-gray-800">{app.studentName}</p>
