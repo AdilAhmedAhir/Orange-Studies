@@ -2,6 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
+import { generateOtp } from "@/app/actions/otp";
+import { sendOtpEmail } from "@/lib/mail";
 
 interface RegisterPayload {
     fullName: string;
@@ -12,7 +14,7 @@ interface RegisterPayload {
 
 export async function registerUser(
     data: RegisterPayload
-): Promise<{ success?: boolean; error?: string }> {
+): Promise<{ success?: boolean; error?: string; requiresVerification?: boolean; email?: string }> {
     if (!data.fullName || !data.email || !data.password) {
         return { error: "Name, email, and password are required." };
     }
@@ -21,8 +23,10 @@ export async function registerUser(
         return { error: "Password must be at least 6 characters." };
     }
 
+    const normalizedEmail = data.email.toLowerCase().trim();
+
     const existing = await prisma.user.findUnique({
-        where: { email: data.email.toLowerCase().trim() },
+        where: { email: normalizedEmail },
     });
 
     if (existing) {
@@ -38,17 +42,29 @@ export async function registerUser(
         return { error: "Too many registrations. Please try again later." };
     }
 
+    // Check if email verification is required
+    const settings = await prisma.systemSetting.findUnique({ where: { id: "global" } });
+    const requireVerification = settings?.requireEmailVerification ?? false;
+
     const hashedPassword = await hash(data.password, 10);
 
     await prisma.user.create({
         data: {
             fullName: data.fullName.trim(),
-            email: data.email.toLowerCase().trim(),
+            email: normalizedEmail,
             passwordHash: hashedPassword,
             phone: data.phone?.trim() || null,
             role: "STUDENT",
+            emailVerified: requireVerification ? null : new Date(),
         },
     });
+
+    // If verification required, generate & send OTP
+    if (requireVerification) {
+        const code = await generateOtp(normalizedEmail, "VERIFY");
+        await sendOtpEmail(normalizedEmail, code, "VERIFY");
+        return { success: true, requiresVerification: true, email: normalizedEmail };
+    }
 
     return { success: true };
 }

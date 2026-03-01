@@ -25,6 +25,14 @@ export const authOptions: NextAuthOptions = {
                 const isValid = await compare(credentials.password, user.passwordHash);
                 if (!isValid) return null;
 
+                // Check email verification requirement for students
+                if (user.role === "STUDENT" && !user.emailVerified) {
+                    const settings = await prisma.systemSetting.findUnique({ where: { id: "global" } });
+                    if (settings?.requireEmailVerification) {
+                        throw new Error("EMAIL_NOT_VERIFIED");
+                    }
+                }
+
                 return {
                     id: user.id,
                     email: user.email,

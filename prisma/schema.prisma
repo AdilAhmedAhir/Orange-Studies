@@ -20,16 +20,17 @@ enum Role {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  fullName     String
-  phone        String?
-  role         Role     @default(STUDENT)
-  nationality  String?
-  currentCity  String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  fullName      String
+  phone         String?
+  role          Role      @default(STUDENT)
+  nationality   String?
+  currentCity   String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   applications Application[]
   documents    Document[]
@@ -214,4 +215,26 @@ model Lead {
   message   String?
   status    String   @default("NEW")
   createdAt DateTime @default(now())
+}
+
+// ─── OTP Codes ───────────────────────────────────────
+model OtpCode {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  type      String   // VERIFY, RESET
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email, type])
+}
+
+// ─── System Settings (singleton) ─────────────────────
+model SystemSetting {
+  id                       String  @id @default("global")
+  smtpHost                 String?
+  smtpPort                 Int?
+  smtpUser                 String?
+  smtpPass                 String?
+  requireEmailVerification Boolean @default(false)
 }

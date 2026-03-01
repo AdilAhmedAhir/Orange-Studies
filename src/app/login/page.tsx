@@ -49,6 +49,11 @@ function LoginForm() {
             });
 
             if (res?.error) {
+                // Check if the error is email verification required
+                if (res.error.includes("EMAIL_NOT_VERIFIED")) {
+                    startTransition(() => router.push(`/verify-email?email=${encodeURIComponent(form.email)}`));
+                    return;
+                }
                 setError("Invalid email or password.");
                 setIsLoading(false);
             } else if (res?.ok) {
@@ -66,6 +71,12 @@ function LoginForm() {
             if (regRes.error) {
                 setError(regRes.error);
                 setIsLoading(false);
+                return;
+            }
+
+            // If email verification is required, redirect to verify-email
+            if (regRes.requiresVerification && regRes.email) {
+                startTransition(() => router.push(`/verify-email?email=${encodeURIComponent(regRes.email!)}`));
                 return;
             }
 
@@ -234,9 +245,9 @@ function LoginForm() {
                                         <input type="checkbox" className="h-3.5 w-3.5 rounded border-neutral-300 accent-brand-purple" />
                                         <span className="text-neutral-500">Remember me</span>
                                     </label>
-                                    <button type="button" className="font-semibold text-brand-purple hover:text-brand-deep transition-colors">
+                                    <Link href="/forgot-password" className="font-semibold text-brand-purple hover:text-brand-deep transition-colors">
                                         Forgot password?
-                                    </button>
+                                    </Link>
                                 </div>
                             )}
 
