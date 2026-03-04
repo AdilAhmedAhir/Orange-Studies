@@ -5,6 +5,17 @@ import { useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, GraduationCap, DollarSign, Clock } from "lucide-react";
 
+/* ── darken a hex color by a percentage ─────────────── */
+function darken(hex: string, percent: number): string {
+    // Handle Tailwind class format — just return a darker shade
+    if (!hex.startsWith("#")) return "#1a1a2e";
+    const num = parseInt(hex.slice(1), 16);
+    const r = Math.max(0, ((num >> 16) & 0xff) - Math.round(255 * (percent / 100)));
+    const g = Math.max(0, ((num >> 8) & 0xff) - Math.round(255 * (percent / 100)));
+    const b = Math.max(0, (num & 0xff) - Math.round(255 * (percent / 100)));
+    return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
+
 /* ── country type (passed from server) ────────────── */
 export interface CountryData {
     slug: string;
@@ -31,8 +42,8 @@ const fallbackCountries: CountryData[] = [
         universities: "160+ Universities",
         avgTuition: "£12,000 – £38,000/yr",
         visaTime: "3 weeks",
-        color: "from-blue-600 to-blue-800",
-        accent: "bg-blue-500",
+        color: "#1e3a5f",
+        accent: "#1e3a5f",
         highlights: ["Oxford & Cambridge", "1-Year Masters", "Post-Study Work Visa"],
     },
     {
@@ -43,8 +54,8 @@ const fallbackCountries: CountryData[] = [
         universities: "4,000+ Universities",
         avgTuition: "$20,000 – $55,000/yr",
         visaTime: "3–5 weeks",
-        color: "from-red-600 to-red-800",
-        accent: "bg-red-500",
+        color: "#b91c1c",
+        accent: "#b91c1c",
         highlights: ["Ivy League", "OPT Work Permit", "Flexible Curriculum"],
     },
     {
@@ -55,8 +66,8 @@ const fallbackCountries: CountryData[] = [
         universities: "100+ Universities",
         avgTuition: "CAD 15,000 – 35,000/yr",
         visaTime: "4–8 weeks",
-        color: "from-red-500 to-rose-700",
-        accent: "bg-red-500",
+        color: "#d42e16",
+        accent: "#d42e16",
         highlights: ["PGWP (3-Year Work Permit)", "Low Living Cost", "PR Pathway"],
     },
     {
@@ -67,8 +78,8 @@ const fallbackCountries: CountryData[] = [
         universities: "43 Universities",
         avgTuition: "AUD 20,000 – 45,000/yr",
         visaTime: "2–4 weeks",
-        color: "from-amber-600 to-yellow-700",
-        accent: "bg-amber-500",
+        color: "#d97706",
+        accent: "#d97706",
         highlights: ["Group of Eight", "Post-Study Work (2–4yr)", "High Quality of Life"],
     },
     {
@@ -79,8 +90,8 @@ const fallbackCountries: CountryData[] = [
         universities: "400+ Universities",
         avgTuition: "€0 – €20,000/yr",
         visaTime: "4–6 weeks",
-        color: "from-neutral-800 to-neutral-900",
-        accent: "bg-neutral-800",
+        color: "#333333",
+        accent: "#333333",
         highlights: ["Free Public Universities", "Engineering Hub", "18-Month Job Seeker Visa"],
     },
     {
@@ -91,8 +102,8 @@ const fallbackCountries: CountryData[] = [
         universities: "70+ Universities",
         avgTuition: "$3,000 – $10,000/yr",
         visaTime: "2–3 weeks",
-        color: "from-blue-700 to-indigo-800",
-        accent: "bg-blue-600",
+        color: "#1e40af",
+        accent: "#1e40af",
         highlights: ["Most Affordable", "English-Medium Programs", "Cultural Diversity"],
     },
 ];
@@ -120,7 +131,8 @@ function CountryCard({
             >
                 {/* Gradient header with flag */}
                 <div
-                    className={`relative flex h-40 items-center justify-center bg-gradient-to-br ${country.color} overflow-hidden`}
+                    className={`relative flex h-40 items-center justify-center overflow-hidden`}
+                    style={{ background: `linear-gradient(135deg, ${country.color}, ${darken(country.color, 40)})` }}
                 >
                     {/* Decorative circles */}
                     <div className="absolute -bottom-8 -right-8 h-28 w-28 rounded-full bg-white/10" />
