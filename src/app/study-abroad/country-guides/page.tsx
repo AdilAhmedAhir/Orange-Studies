@@ -3,7 +3,7 @@ import { CountryGuidesHero } from "@/components/study-abroad/CountryGuidesHero";
 import { CTABanner } from "@/components/home/CTABanner";
 import { Footer } from "@/components/home/Footer";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 export default async function CountryGuidesPage() {
     const dbCountries = await prisma.country.findMany({

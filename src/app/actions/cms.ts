@@ -21,6 +21,7 @@ function revalidateCMS(opts?: { universitySlug?: string; programSlug?: string; c
     revalidatePath("/programs");
     revalidatePath("/search");
     revalidatePath("/study-abroad");
+    revalidatePath("/study-abroad/country-guides");
     revalidatePath("/dashboard/admin");
     revalidatePath("/dashboard/admin/universities");
     revalidatePath("/dashboard/admin/programs");
@@ -94,8 +95,8 @@ export async function upsertCountry(data: CountryPayload): Promise<{ success: bo
                     colorAccent: data.colorAccent || null,
                 },
             });
+            revalidateCMS({ countrySlug: slug });
         }
-        revalidateCMS({ countrySlug: data.id ? undefined : slugify(data.name) });
         return { success: true };
     } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Failed.";

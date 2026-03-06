@@ -7,7 +7,7 @@ import {
 import { CTABanner } from "@/components/home/CTABanner";
 import { Footer } from "@/components/home/Footer";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 const servicesOffered = [
     { title: "Student Recruitment", description: "We source, screen, and refer quality international students to your programs, ensuring they meet your admission criteria.", icon: Users, color: "from-brand-orange to-amber-400" },

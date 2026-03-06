@@ -3,7 +3,7 @@ import { getProgramBySlug } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 import ProgramDetailClient from "./ProgramDetailClient";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {

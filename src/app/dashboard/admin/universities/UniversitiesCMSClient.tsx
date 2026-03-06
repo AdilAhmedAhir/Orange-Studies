@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, Plus, Pencil, Trash2, Loader2, X, Search } from "lucide-react";
 import AdminCMSLayout from "@/components/admin/AdminCMSLayout";
@@ -35,6 +36,7 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
     const [loading, setLoading] = useState(false);
     const [deleting, setDeleting] = useState<string | null>(null);
     const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+    const router = useRouter();
 
     const filtered = universities.filter((u) => u.name.toLowerCase().includes(search.toLowerCase()) || u.location.toLowerCase().includes(search.toLowerCase()));
 
@@ -85,7 +87,7 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
             tags: form.tags,
         });
         setLoading(false);
-        if (res.success) { setModal(false); setForm(EMPTY); setEditId(null); }
+        if (res.success) { setModal(false); setForm(EMPTY); setEditId(null); router.refresh(); }
         else setMsg({ type: "err", text: res.error || "Failed." });
     };
 
@@ -94,6 +96,7 @@ export default function UniversitiesCMSClient({ universities, countries }: { uni
         setDeleting(id);
         const res = await deleteUniversity(id);
         if (!res.success) alert(res.error || "Delete failed.");
+        else router.refresh();
         setDeleting(null);
     };
 

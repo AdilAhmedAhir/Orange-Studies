@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Globe, Plus, Pencil, Trash2, Loader2, X, Search } from "lucide-react";
 import AdminCMSLayout from "@/components/admin/AdminCMSLayout";
@@ -25,6 +26,7 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
     const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
     const [isSeeding, startSeedTransition] = useTransition();
     const [seedMsg, setSeedMsg] = useState<string | null>(null);
+    const router = useRouter();
 
     const filtered = countries.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.code.toLowerCase().includes(search.toLowerCase()));
 
@@ -52,7 +54,7 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
             colorAccent: form.colorAccent,
         });
         setLoading(false);
-        if (res.success) { setModal(false); setForm(EMPTY); setEditId(null); }
+        if (res.success) { setModal(false); setForm(EMPTY); setEditId(null); router.refresh(); }
         else setMsg({ type: "err", text: res.error || "Failed." });
     };
 
@@ -61,6 +63,7 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
         setDeleting(id);
         const res = await deleteCountry(id);
         if (!res.success) alert(res.error || "Delete failed.");
+        else router.refresh();
         setDeleting(null);
     };
 
@@ -78,7 +81,7 @@ export default function CountriesCMSClient({ countries }: { countries: Country[]
                             setSeedMsg(null);
                             startSeedTransition(async () => {
                                 const res = await seedDefaultCountries();
-                                if (res.success) setSeedMsg(`✅ Seeded ${res.count} countries!`);
+                                if (res.success) { setSeedMsg(`✅ Seeded ${res.count} countries!`); router.refresh(); }
                                 else setSeedMsg(`❌ ${res.error}`);
                             });
                         }}

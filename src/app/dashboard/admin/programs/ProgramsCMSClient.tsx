@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, Plus, Pencil, Trash2, Loader2, X, Search } from "lucide-react";
 import AdminCMSLayout from "@/components/admin/AdminCMSLayout";
@@ -36,6 +37,7 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
     const [loading, setLoading] = useState(false);
     const [deleting, setDeleting] = useState<string | null>(null);
     const [msg, setMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+    const router = useRouter();
 
     const filtered = programs.filter((p) => p.title.toLowerCase().includes(search.toLowerCase()) || p.universityName.toLowerCase().includes(search.toLowerCase()));
 
@@ -72,7 +74,7 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
             careerOutcomes: form.careerOutcomes as string,
         });
         setLoading(false);
-        if (res.success) { setModal(false); setForm(EMPTY); setEditId(null); }
+        if (res.success) { setModal(false); setForm(EMPTY); setEditId(null); router.refresh(); }
         else setMsg({ type: "err", text: res.error || "Failed." });
     };
 
@@ -81,6 +83,7 @@ export default function ProgramsCMSClient({ programs, universities }: { programs
         setDeleting(id);
         const res = await deleteProgram(id);
         if (!res.success) alert(res.error || "Delete failed.");
+        else router.refresh();
         setDeleting(null);
     };
 

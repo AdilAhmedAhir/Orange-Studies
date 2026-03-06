@@ -3,7 +3,7 @@ import { getUniversityBySlug } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 import UniversityDetailClient from "./UniversityDetailClient";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {

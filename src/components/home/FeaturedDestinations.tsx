@@ -15,9 +15,19 @@ interface Destination {
     gradient: string;
     accent: string;
     image: string;
+    slug?: string;
 }
 
-const destinations: Destination[] = [
+export interface DynamicDestination {
+    name: string;
+    flag: string;
+    slug: string;
+    programCount: number;
+    image?: string | null;
+    colorAccent?: string | null;
+}
+
+const FALLBACK_DESTINATIONS: Destination[] = [
     {
         country: "United Kingdom",
         flag: "🇬🇧",
@@ -73,6 +83,33 @@ const destinations: Destination[] = [
         image: "/images/destinations/malaysia.png",
     },
 ];
+
+/* Map country names to image paths + color schemes */
+const COUNTRY_IMAGES: Record<string, { image: string; color: string; gradient: string; accent: string }> = {
+    "united kingdom": { image: "/images/destinations/uk.png", color: "from-blue-600 to-blue-800", gradient: "from-blue-500/20 to-blue-700/20", accent: "#3b82f6" },
+    "united states": { image: "/images/destinations/usa.png", color: "from-red-600 to-blue-700", gradient: "from-red-500/20 to-blue-600/20", accent: "#ef4444" },
+    "canada": { image: "/images/destinations/canada.png", color: "from-red-600 to-red-800", gradient: "from-red-500/20 to-red-700/20", accent: "#dc2626" },
+    "australia": { image: "/images/destinations/australia.png", color: "from-blue-700 to-indigo-900", gradient: "from-blue-600/20 to-indigo-800/20", accent: "#4f46e5" },
+    "germany": { image: "/images/destinations/germany.png", color: "from-yellow-500 to-red-600", gradient: "from-yellow-400/20 to-red-500/20", accent: "#eab308" },
+    "malaysia": { image: "/images/destinations/malaysia.png", color: "from-blue-600 to-yellow-500", gradient: "from-blue-500/20 to-yellow-400/20", accent: "#2563eb" },
+    "bangladesh": { image: "/images/destinations/bangladesh.png", color: "from-green-600 to-green-800", gradient: "from-green-500/20 to-green-700/20", accent: "#16a34a" },
+};
+
+const DEFAULT_STYLE = { image: "/images/destinations/default.png", color: "from-brand-purple to-purple-800", gradient: "from-purple-500/20 to-purple-700/20", accent: "#662D91" };
+
+function mapDynamicToDestination(d: DynamicDestination): Destination {
+    const style = COUNTRY_IMAGES[d.name.toLowerCase()] || DEFAULT_STYLE;
+    return {
+        country: d.name,
+        flag: d.flag,
+        programs: `${d.programCount}+ Programs`,
+        color: style.color,
+        gradient: style.gradient,
+        accent: d.colorAccent || style.accent,
+        image: d.image || style.image,
+        slug: d.slug,
+    };
+}
 
 /* ── 3D Tilt Card ──────────────────────────────────────────── */
 function DestinationCard({
@@ -246,8 +283,12 @@ function DestinationCard({
 }
 
 /* ── Section ───────────────────────────────────────────────── */
-export function FeaturedDestinations() {
+export function FeaturedDestinations({ dynamicDestinations }: { dynamicDestinations?: DynamicDestination[] }) {
     const { ref, isInView } = useScrollReveal();
+
+    const destinations: Destination[] = dynamicDestinations && dynamicDestinations.length > 0
+        ? dynamicDestinations.map(mapDynamicToDestination)
+        : FALLBACK_DESTINATIONS;
 
     return (
         <section className="relative z-10 bg-neutral-50/80 px-6 py-24 lg:py-32 overflow-hidden">
