@@ -244,3 +244,21 @@ model SystemSetting {
   smtpPass                 String?
   requireEmailVerification Boolean @default(false)
 }
+
+// ─── Page Sections (Admin-controllable frontend content) ──
+model PageSection {
+  id          String   @id @default(cuid())
+  page        String   // "home", "about", "study-abroad", "contact", "institutions"
+  section     String   // "hero", "stats", "how-it-works", "featured-destinations", etc.
+  title       String?
+  subtitle    String?
+  description String?  @db.Text
+  items       Json?    // Structured items (features, steps, testimonials, etc.)
+  image       String?
+  enabled     Boolean  @default(true)
+  displayOrder Int     @default(0)
+  updatedAt   DateTime @updatedAt
+
+  @@unique([page, section])
+  @@index([page])
+}

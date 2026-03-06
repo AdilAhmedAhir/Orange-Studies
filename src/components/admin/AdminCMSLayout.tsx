@@ -24,6 +24,7 @@ const NAV_SECTIONS = [
             { href: "/dashboard/admin/universities", label: "Universities", icon: Building2 },
             { href: "/dashboard/admin/programs", label: "Programs", icon: GraduationCap },
             { href: "/dashboard/admin/countries", label: "Countries", icon: Globe },
+            { href: "/dashboard/admin/pages", label: "Page Settings", icon: FileText },
         ],
     },
     {
